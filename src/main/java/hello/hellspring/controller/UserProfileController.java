@@ -44,8 +44,11 @@ public class UserProfileController {
 
     // Data 생성 시 POST
     @PostMapping("/user/{id}")
-    public void postUserProfile(@PathVariable("id") String id, @RequestParam("name") String name, @RequestParam("pw") String pw) {
-        mapper.insertUserProfile(id, name, pw);
+    public void postUserProfile(@PathVariable("id") String id,
+                                @RequestParam("name") String name,
+                                @RequestParam("pw") String pw,
+                                @RequestParam("photoURL") String photoURL) {
+        mapper.insertUserProfile(id, name, pw, photoURL);
 
     }
 
@@ -66,5 +69,9 @@ public class UserProfileController {
         mapper.deleteProfile(id);
         // DB 연결 안된 경우
         // userMap.remove(id);
+
+
+        // create, update, delete
+
     }
 }

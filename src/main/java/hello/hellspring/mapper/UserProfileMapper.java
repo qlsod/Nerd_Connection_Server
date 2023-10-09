@@ -18,8 +18,8 @@ public interface UserProfileMapper {
 
 
     // insert, update, delete의 경우 SQL문에 의해 적용된 또는 영향 받은 레코드의 개수가 반환된다.
-    @Insert("INSERT INTO UserProfile(id, name, pw) VALUES (#{id}, #{name}, #{pw})")
-    int insertUserProfile(@Param("id") String id, @Param("name") String name, @Param("pw") String pw);
+    @Insert("INSERT INTO UserProfile(id, name, pw, photoURL) VALUES (#{id}, #{name}, #{pw}, #{photoURL})")
+    int insertUserProfile(@Param("id") String id, @Param("name") String name, @Param("pw") String pw, @Param("photoURL") String photoURL);
     // POST 입력
 
     @Update("UPDATE UserProfile SET name=#{name}, pw=#{pw} WHERE id=#{id}")

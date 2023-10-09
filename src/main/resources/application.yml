@@ -6,9 +6,9 @@ server:
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/wonderful?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    username: root
-    password: 1234
+    url: jdbc:mysql://nc-database.cblgksyvpiho.ap-northeast-2.rds.amazonaws.com:3306/ncDB?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    username: admin
+    password: nerdconnection
   thymeleaf:
     cache: false
 
