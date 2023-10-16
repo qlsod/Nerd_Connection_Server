@@ -2,30 +2,35 @@ package hello.hellspring.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.text.SimpleDateFormat;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PastOrPresent;
+import javax.validation.constraints.Positive;
 import java.util.Date;
 
-@Getter
-@Setter
 @Data
 public class User {
+
     private int no;
+
+    // 유효성 검사
+    @NotBlank
     private String id;
+
+    @NotBlank
     private String name;
+
+    @NotBlank
     private String pw;
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss",
-//            timezone = "Asia/Seoul")
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss",
+            timezone = "Asia/Seoul")
     private Date create_date;
-//
-//
-//    //  한국 시간에 맞춰 get할 때 사용
-////    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss",
-////            timezone = "Asia/Seoul")
+
+//  한국 시간에 맞춰 get할 때 사용
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss",
+            timezone = "Asia/Seoul")
     private Date update_date;
-//
+
     private Date delete_date;
 }

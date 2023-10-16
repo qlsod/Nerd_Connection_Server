@@ -11,7 +11,7 @@ public interface UserMapper {
     // id의 경우 sql문(@Insert) 안에서 수행되어 작성되기 때문에 users의 no가 비어 있음 이를 세팅하기 위해 @Options 사용
     @Insert("INSERT INTO users(id, name, pw)" +
             "VALUES" +
-            "(#{signUp.id}, #{signUp.name}, #{signUp.pw}")
+            "(#{signUp.id}, #{signUp.name}, #{signUp.pw})")
     @Options(useGeneratedKeys = true, keyProperty = "no")
     int insertUserProfile(@Param("signUp") User user);
 
@@ -19,6 +19,10 @@ public interface UserMapper {
     @ResultMap("UserProfileMap")
     @Select("SELECT * FROM users WHERE no=#{no}")
     User getUserProfile(@Param("no") int no);
+
+    @ResultMap("UserProfileMap")
+    @Select("SELECT id FROM users")
+    List<User> getAllUserId();
 
     // GET all
     // property와 column 매칭
@@ -30,6 +34,15 @@ public interface UserMapper {
     })
     @Select("SELECT * FROM users")
     List<User> getAll();
+
+
+
+
+
+
+
+
+
 
 //    // insert, update, delete의 경우 SQL문에 의해 적용된 또는 영향 받은 레코드의 개수가 반환된다.
 //    @Update("UPDATE UserProfile SET name=#{name}, pw=#{pw} WHERE id=#{id}")

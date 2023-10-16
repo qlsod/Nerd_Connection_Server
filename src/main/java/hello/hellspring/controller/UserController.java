@@ -3,11 +3,18 @@ package hello.hellspring.controller;
 import hello.hellspring.mapper.UserMapper;
 import hello.hellspring.model.User;
 import hello.hellspring.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -22,25 +29,32 @@ public class UserController {
     @GetMapping("/no/{no}")
     public User getUser(@PathVariable("no") int no) {
         return userMapper.getUserProfile(no);
-        // DB 연결 안된 경우
-        // return userMap.get(id);
     }
 
     @GetMapping("/all")
     public List<User> getUserList() {
-        return userMapper.getAll();
-        // DB 연결 안된 경우
-        // return new ArrayList<UserProfile>(userMap.values());
+        return userService.findUserList();
     }
 
     // Data 생성 시 POST
+    // 전처리 위한 @Vaild 이용
     @PostMapping("/signUp")
-    public User postUsers(@RequestBody User user) {
-//        userService.currentDate();
-//        userService.signUp(user);
-        userMapper.insertUserProfile(user);
-        return user;
-        // insert문에 의한 return 결과는 입력된 데이터 개수 반환 (입력 성공 = 1, 실패 = 0)
+    public User postUsers(@RequestBody @Valid User user, BindingResult bindingResult) {
+
+        // 전처리(유효성) 검사 불통과 할 시
+        if (bindingResult.hasErrors()) {
+            log.error("hasError 발생");
+            Map<String, String> errors = new HashMap<>();
+
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
+            throw new RuntimeException("회원가입 유효성 검사 실패");
+        } else {
+            userService.signUp(user);
+            return user;
+        }
+
     }
 
 //    // Data 수정 시 PUT(잘 안씀)
