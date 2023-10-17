@@ -1,14 +1,17 @@
 package hello.hellspring.controller;
 
 import hello.hellspring.mapper.UserMapper;
+import hello.hellspring.model.LoginDTO;
 import hello.hellspring.model.User;
 import hello.hellspring.service.UserService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +32,18 @@ public class UserController {
     @GetMapping("/no/{no}")
     public User getUser(@PathVariable("no") int no) {
         return userMapper.getUserProfile(no);
+    }
+
+    @PostMapping("/login")
+    public String userLogin(@RequestBody LoginDTO loginDTO, HttpSession session) {
+        boolean loginResult = userService.login(loginDTO);
+        log.info(String.valueOf(loginDTO));
+        if (loginResult) {
+            session.setAttribute("loginId", loginDTO.getId());
+            return "성공";
+        } else {
+            return "실패";
+        }
     }
 
     @GetMapping("/all")

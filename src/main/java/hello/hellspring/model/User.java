@@ -2,10 +2,7 @@ package hello.hellspring.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.PastOrPresent;
-import javax.validation.constraints.Positive;
 import java.util.Date;
 
 @Data

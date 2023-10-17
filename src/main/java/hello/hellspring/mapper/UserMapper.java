@@ -1,4 +1,5 @@
 package hello.hellspring.mapper;
+import hello.hellspring.model.LoginDTO;
 import hello.hellspring.model.User;
 import org.apache.ibatis.annotations.*;
 import java.util.List;
@@ -13,7 +14,7 @@ public interface UserMapper {
             "VALUES" +
             "(#{signUp.id}, #{signUp.name}, #{signUp.pw})")
     @Options(useGeneratedKeys = true, keyProperty = "no")
-    int insertUserProfile(@Param("signUp") User user);
+    void insertUserProfile(@Param("signUp") User user);
 
     // GET
     @ResultMap("UserProfileMap")
@@ -35,9 +36,8 @@ public interface UserMapper {
     @Select("SELECT * FROM users")
     List<User> getAll();
 
-
-
-
+    @Select("SELECT * FROM users WHERE id=#{id} and pw=#{pw}")
+    LoginDTO login(LoginDTO loginDTO);
 
 
 

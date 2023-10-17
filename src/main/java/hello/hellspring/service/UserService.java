@@ -1,8 +1,10 @@
 package hello.hellspring.service;
 
 import hello.hellspring.mapper.UserMapper;
+import hello.hellspring.model.LoginDTO;
 import hello.hellspring.model.User;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.juli.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,7 +60,13 @@ public class UserService {
         return userMapper.getAll();
     }
 
-    public void login() {
-
+    public boolean login(LoginDTO loginDTO) {
+        LoginDTO loginMember = userMapper.login(loginDTO);
+        log.info(String.valueOf(loginMember));
+        if (loginMember != null) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
