@@ -1,4 +1,4 @@
-package hello.hellspring.model;
+package pallet_spring.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;

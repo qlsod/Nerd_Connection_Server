@@ -1,13 +1,13 @@
-package hello.hellspring;
+package pallet_spring;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class HellSpringApplication {
+public class PalletApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(HellSpringApplication.class, args);
+		SpringApplication.run(PalletApplication.class, args);
 	}
 
 }

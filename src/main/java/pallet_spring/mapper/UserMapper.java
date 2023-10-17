@@ -1,6 +1,6 @@
-package hello.hellspring.mapper;
-import hello.hellspring.model.LoginDTO;
-import hello.hellspring.model.User;
+package pallet_spring.mapper;
+import pallet_spring.model.LoginDTO;
+import pallet_spring.model.User;
 import org.apache.ibatis.annotations.*;
 import java.util.List;
 

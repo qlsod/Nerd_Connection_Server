@@ -1,4 +1,4 @@
-package hello.hellspring.handler;
+package pallet_spring.handler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;

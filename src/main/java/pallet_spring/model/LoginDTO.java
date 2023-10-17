@@ -1,4 +1,4 @@
-package hello.hellspring.model;
+package pallet_spring.model;
 import lombok.Data;
 import javax.validation.constraints.NotBlank;
 

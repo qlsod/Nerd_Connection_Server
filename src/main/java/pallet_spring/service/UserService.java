@@ -1,8 +1,8 @@
-package hello.hellspring.service;
+package pallet_spring.service;
 
-import hello.hellspring.mapper.UserMapper;
-import hello.hellspring.model.LoginDTO;
-import hello.hellspring.model.User;
+import pallet_spring.mapper.UserMapper;
+import pallet_spring.model.LoginDTO;
+import pallet_spring.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
