@@ -36,10 +36,8 @@ public interface UserMapper {
     @Select("SELECT * FROM users")
     List<User> getAll();
 
-    @Select("SELECT * FROM users WHERE id=#{id} and pw=#{pw}")
+    @Select("SELECT * FROM users WHERE id=#{id}")
     LoginDTO login(LoginDTO loginDTO);
-
-
 
 
 

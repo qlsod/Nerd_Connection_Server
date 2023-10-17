@@ -4,8 +4,9 @@ import hello.hellspring.mapper.UserMapper;
 import hello.hellspring.model.LoginDTO;
 import hello.hellspring.model.User;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.juli.logging.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,8 @@ import java.util.List;
 @Slf4j
 public class UserService {
 
+    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
     private User user;
     @Autowired
     private UserMapper userMapper;
@@ -23,7 +26,13 @@ public class UserService {
     public void signUp(User user) {
         if (!user.getId().isEmpty() && !user.getName().isEmpty() && !user.getPw().isEmpty()) {
             log.info("빈칸없음");
-            boolean isIdExists = false;  // flag를 사용하여 ID가 존재하는지 여부를 확인
+
+            String encodedPassword = passwordEncoder.encode(user.getPw());
+            user.setPw(encodedPassword);
+            log.info(String.valueOf(user));
+
+            boolean isIdExists = false;
+
             List<User> userIdList = findAllUserId();
             if (userIdList.isEmpty()) {
                 log.info("userIdList 값 없을 경우(초기세팅)");
@@ -61,12 +70,21 @@ public class UserService {
     }
 
     public boolean login(LoginDTO loginDTO) {
+
         LoginDTO loginMember = userMapper.login(loginDTO);
+
         log.info(String.valueOf(loginMember));
-        if (loginMember != null) {
-            return true;
-        } else {
+
+        if (loginMember == null ) {
             return false;
+        } else {
+            String rawPassword = loginDTO.getPw();
+            String encodedPassword = loginMember.getPw();
+            if (passwordEncoder.matches(rawPassword, encodedPassword)) {
+                return true;
+            } else {
+                throw new RuntimeException("입력한 비밀번호가 맞지 않습니다");
+            }
         }
     }
 }

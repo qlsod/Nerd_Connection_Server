@@ -5,8 +5,8 @@ import hello.hellspring.model.LoginDTO;
 import hello.hellspring.model.User;
 import hello.hellspring.service.UserService;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
@@ -35,15 +35,27 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String userLogin(@RequestBody LoginDTO loginDTO, HttpSession session) {
-        boolean loginResult = userService.login(loginDTO);
-        log.info(String.valueOf(loginDTO));
-        if (loginResult) {
-            session.setAttribute("loginId", loginDTO.getId());
-            return "성공";
-        } else {
-            return "실패";
+    public String userLogin(@RequestBody @Valid LoginDTO loginDTO, BindingResult bindingResult, HttpSession session) {
+        if (bindingResult.hasErrors()) {
+            log.error("유효성 검사 오류 발생");
+            Map<String, String> errors = new HashMap<>();
+
+            for (FieldError error : bindingResult.getFieldErrors()) {
+                errors.put(error.getField(), error.getDefaultMessage());
+            }
+            throw new RuntimeException("NotBlank 조건 충족 못함");
+        }else {
+
+            boolean loginResult = userService.login(loginDTO);
+            log.info(String.valueOf(loginDTO));
+            if (loginResult) {
+                session.setAttribute("loginId", loginDTO.getId());
+                return "성공";
+            } else {
+                throw new RuntimeException("가입된 계정이 없습니다.");
+            }
         }
+
     }
 
     @GetMapping("/all")
@@ -51,10 +63,14 @@ public class UserController {
         return userService.findUserList();
     }
 
+
     // Data 생성 시 POST
     // 전처리 위한 @Vaild 이용
     @PostMapping("/signUp")
     public User postUsers(@RequestBody @Valid User user, BindingResult bindingResult) {
+
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();  // 암호 강도 Default 10
+        String result = encoder.encode("pw");
 
         // 전처리(유효성) 검사 불통과 할 시
         if (bindingResult.hasErrors()) {
@@ -64,7 +80,7 @@ public class UserController {
             for (FieldError error : bindingResult.getFieldErrors()) {
                 errors.put(error.getField(), error.getDefaultMessage());
             }
-            throw new RuntimeException("회원가입 유효성 검사 실패");
+            throw new RuntimeException("NotBlank 충족 못함");
         } else {
             userService.signUp(user);
             return user;
