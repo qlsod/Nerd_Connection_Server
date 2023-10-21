@@ -1,5 +1,4 @@
 package pallet_spring.controller;
-
 import pallet_spring.mapper.UserMapper;
 import pallet_spring.model.LoginDTO;
 import pallet_spring.model.User;
@@ -8,19 +7,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
 @RequestMapping("/users")
 public class UserController {
+
 
     @Autowired
     private UserMapper userMapper;
@@ -31,18 +27,22 @@ public class UserController {
     // Data 조회 시 Get
     @GetMapping("/{no}")
     public User getUser(@PathVariable("no") int no) {
-        return userMapper.getUserProfile(no);
+        User user = userMapper.getUserProfile(no);
+        if (user == null) {
+            throw new RuntimeException("계정정보가 없습니다");
+        } else {
+            return user;
+        }
     }
 
     @PostMapping("/login")
-
-    // 인증 토큰 넘겨야 함
-
-
-
-    public String userLogin(@RequestBody @Valid LoginDTO loginDTO, BindingResult bindingResult, HttpSession session) {
+    public String userLogin(@RequestBody @Valid LoginDTO loginDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
+
+// 인증 토큰 넘겨야 함
+
             log.error("유효성 검사 오류 발생");
+
 //            Map<String, String> errors = new HashMap<>();
 //
 //            for (FieldError error : bindingResult.getFieldErrors()) {
@@ -52,7 +52,6 @@ public class UserController {
         } else {
             boolean loginResult = userService.login(loginDTO);
             if (loginResult) {
-                session.setAttribute("loginId", loginDTO.getId());
                 return "로그인 성공";
             } else {
                 throw new RuntimeException("가입된 계정이 없습니다.");
@@ -66,9 +65,10 @@ public class UserController {
     }
 
 
+
     // Data 생성 시 POST
     // 전처리 위한 @Vaild 이용
-    @PostMapping("/signUp")
+    @PostMapping("/signup")
     public String postUsers(@RequestBody @Valid User user, BindingResult bindingResult) {
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();  // 암호 강도 Default 10
