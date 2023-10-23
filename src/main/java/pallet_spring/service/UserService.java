@@ -16,7 +16,7 @@ import java.util.List;
 @Slf4j
 public class UserService {
 
-    private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+    private final PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
     private User user;
     @Autowired
@@ -24,44 +24,28 @@ public class UserService {
 
     @Transactional
     public void signUp(User user) {
-        if (!user.getId().isEmpty() && !user.getName().isEmpty() && !user.getPw().isEmpty()) {
-            log.info("빈칸없음");
 
-            String encodedPassword = passwordEncoder.encode(user.getPw());
-            user.setPw(encodedPassword);
-            log.info(String.valueOf(user));
+        // 입력한 Pw 암호화
+        String encodedPassword = passwordEncoder.encode(user.getPw());
+        user.setPw(encodedPassword);
 
-            boolean isIdExists = false;
-
-            List<User> userIdList = findAllUserId();
-            if (userIdList.isEmpty()) {
-                log.info("userIdList 값 없을 경우(초기세팅)");
-                userMapper.insertUserProfile(user);
-            } else {
-                log.info("DB의 id의 값이 존재할 경우");
-                for (User userDB : userIdList) {
-                    log.info("입력한 id의 값과 DB의 id의 값 비교");
-                    if (user.getId().equals(userDB.getId())) {
-                        isIdExists = true;
-                        log.info("이미 가입된 ID입니다");
-
-                        // Exception 발생 시키기
-                        throw new RuntimeException("이미 가입된 ID입니다.");
-                    }
-                }
-                if (!isIdExists) {
-                    log.info("같은 id 없을 경우 insertUserProfile 실행");
-                    userMapper.insertUserProfile(user);
+        List<User> userIdList = findAllUserId();
+        if (userIdList.isEmpty()) {
+            log.info("초기 세팅");
+            userMapper.insertUserProfile(user);
+        } else {
+            for (User userDB : userIdList) {
+                if (user.getId().equals(userDB.getId())) {
+                    // Exception 발생 시키기
+                    throw new RuntimeException("이미 가입된 ID입니다.");
                 }
             }
-        } else {
-            log.info("빈칸있음");
+            log.info("같은 id 없을 경우 insertUserProfile 실행");
+            userMapper.insertUserProfile(user);
         }
     }
 
-
     public List<User> findAllUserId() {
-        log.info("모든 user의 id 값 조회");
         return userMapper.getAllUserId();
     }
 
@@ -72,7 +56,6 @@ public class UserService {
     public boolean login(LoginDTO loginDTO) {
 
         LoginDTO loginMember = userMapper.login(loginDTO);
-
         log.info(String.valueOf(loginMember));
 
         if (loginMember == null ) {
@@ -80,6 +63,7 @@ public class UserService {
         } else {
             String rawPassword = loginDTO.getPw();
             String encodedPassword = loginMember.getPw();
+
             if (passwordEncoder.matches(rawPassword, encodedPassword)) {
                 return true;
             } else {
@@ -87,4 +71,5 @@ public class UserService {
             }
         }
     }
+
 }
