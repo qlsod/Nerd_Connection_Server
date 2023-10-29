@@ -10,7 +10,9 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -36,23 +38,27 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public String userLogin(@RequestBody @Valid LoginDTO loginDTO, BindingResult bindingResult) {
+    public Map<String, Object> userLogin(@RequestBody @Valid LoginDTO loginDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-
-// 인증 토큰 넘겨야 함
-
             log.error("유효성 검사 오류 발생");
-
 //            Map<String, String> errors = new HashMap<>();
 //
 //            for (FieldError error : bindingResult.getFieldErrors()) {
 //                errors.put(error.getField(), error.getDefaultMessage());
 //            }
+
             throw new RuntimeException("NotBlank 조건 충족 못함");
-        } else {
+
+        }
+        else // 유효성 검사 통과
+        {
             boolean loginResult = userService.login(loginDTO);
             if (loginResult) {
-                return "로그인 성공";
+                // jwt create 메소드
+                String token = userService.jwtLogin(loginDTO);
+                Map<String, Object> jwtMap = new LinkedHashMap<>();
+                jwtMap.put("token", token);
+                return jwtMap;
             } else {
                 throw new RuntimeException("가입된 계정이 없습니다.");
             }
