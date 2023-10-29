@@ -1,5 +1,6 @@
 package pallet_spring.service;
 
+import org.springframework.beans.factory.annotation.Value;
 import pallet_spring.mapper.UserMapper;
 import pallet_spring.model.LoginDTO;
 import pallet_spring.model.User;
@@ -9,7 +10,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import pallet_spring.security.JwtUtil;
 import java.util.List;
 
 @Service
@@ -71,5 +72,23 @@ public class UserService {
             }
         }
     }
+
+
+
+    @Value("${jwt.secret}")
+    private String secretKey;
+
+    public String jwtLogin(LoginDTO loginDTO) {
+        // 인증과정 생략
+
+        String userId = loginDTO.getId();
+
+        // 유효 시간 1시간
+        Long expiredMs = 1000 * 60L;
+
+        return JwtUtil.createJwt(userId, secretKey, expiredMs);
+    }
+
+
 
 }
