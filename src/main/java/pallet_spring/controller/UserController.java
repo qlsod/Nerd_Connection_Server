@@ -1,7 +1,7 @@
 package pallet_spring.controller;
 import pallet_spring.mapper.UserMapper;
-import pallet_spring.model.LoginDTO;
-import pallet_spring.model.User;
+import pallet_spring.DTO.Login;
+import pallet_spring.DTO.User;
 import pallet_spring.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,6 @@ import java.util.Map;
 @RequestMapping("/users")
 public class UserController {
 
-
     @Autowired
     private UserMapper userMapper;
 
@@ -36,9 +35,8 @@ public class UserController {
             return user;
         }
     }
-
     @PostMapping("/login")
-    public Map<String, Object> userLogin(@RequestBody @Valid LoginDTO loginDTO, BindingResult bindingResult) {
+    public Map<String, Object> userLogin(@RequestBody @Valid Login login, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             log.error("유효성 검사 오류 발생");
 //            Map<String, String> errors = new HashMap<>();
@@ -52,10 +50,10 @@ public class UserController {
         }
         else // 유효성 검사 통과
         {
-            boolean loginResult = userService.login(loginDTO);
+            boolean loginResult = userService.login(login);
             if (loginResult) {
                 // jwt create 메소드
-                String token = userService.jwtLogin(loginDTO);
+                String token = userService.jwtLogin(login);
                 Map<String, Object> jwtMap = new LinkedHashMap<>();
                 jwtMap.put("token", token);
                 return jwtMap;
@@ -78,7 +76,7 @@ public class UserController {
     public String postUsers(@RequestBody @Valid User user, BindingResult bindingResult) {
 
         BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();  // 암호 강도 Default 10
-        String result = encoder.encode("pw");
+        String result = encoder.encode("password");
 
         // 전처리(유효성) 검사 불통과 할 시
         if (bindingResult.hasErrors()) {

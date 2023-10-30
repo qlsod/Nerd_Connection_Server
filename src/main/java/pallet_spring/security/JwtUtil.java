@@ -11,7 +11,7 @@ public class JwtUtil {
 
     public static String createJwt(String userId, String secretKey, Long expiredMs) {
         Claims claims = Jwts.claims();
-        claims.put("userName", userId);
+        claims.put("userId", userId);
         return Jwts.builder()
                 .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
@@ -25,6 +25,8 @@ public class JwtUtil {
                 .getBody().getExpiration().before(new Date());
     }
 
+
+    // user ID 꺼내기
     public static String getUserId(String token, String secretKey) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
                 .getBody().get("userId", String.class);

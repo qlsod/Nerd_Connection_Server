@@ -1,6 +1,6 @@
 package pallet_spring.mapper;
-import pallet_spring.model.LoginDTO;
-import pallet_spring.model.User;
+import pallet_spring.DTO.Login;
+import pallet_spring.DTO.User;
 import org.apache.ibatis.annotations.*;
 import java.util.List;
 
@@ -10,9 +10,9 @@ public interface UserMapper {
 
     // POST 입력
     // id의 경우 sql문(@Insert) 안에서 수행되어 작성되기 때문에 users의 no가 비어 있음 이를 세팅하기 위해 @Options 사용
-    @Insert("INSERT INTO users(id, name, pw)" +
+    @Insert("INSERT INTO users(id, name, password)" +
             "VALUES" +
-            "(#{signUp.id}, #{signUp.name}, #{signUp.pw})")
+            "(#{signUp.id}, #{signUp.name}, #{signUp.password})")
     @Options(useGeneratedKeys = true, keyProperty = "no")
     void insertUserProfile(@Param("signUp") User user);
 
@@ -20,6 +20,9 @@ public interface UserMapper {
     @ResultMap("UserProfileMap")
     @Select("SELECT * FROM users WHERE no=#{no}")
     User getUserProfile(@Param("no") int no);
+
+    @Select("SELECT * FROM users WHERE id=#{id}")
+    User getUserDetail(@Param("id") String id);
 
     @ResultMap("UserProfileMap")
     @Select("SELECT id FROM users")
@@ -37,15 +40,8 @@ public interface UserMapper {
     List<User> getAll();
 
     @Select("SELECT * FROM users WHERE id=#{id}")
-    LoginDTO login(LoginDTO loginDTO);
+    Login login(Login login);
 
-//    // insert, update, delete의 경우 SQL문에 의해 적용된 또는 영향 받은 레코드의 개수가 반환된다.
-//    @Update("UPDATE UserProfile SET name=#{name}, pw=#{pw} WHERE id=#{id}")
-//    int updateUserProfile(@Param("id") String id, @Param("name") String name, @Param("pw") String pw);
-//    // PUT 수정
 
-//    @Delete("DELETE FROM UserProfile WHERE id=#{id}")
-//    int deleteProfile(@Param("id") String id);
-//    // DELETE 삭제
 
 }

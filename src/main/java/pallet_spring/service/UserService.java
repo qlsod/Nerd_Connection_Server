@@ -2,8 +2,8 @@ package pallet_spring.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import pallet_spring.mapper.UserMapper;
-import pallet_spring.model.LoginDTO;
-import pallet_spring.model.User;
+import pallet_spring.DTO.Login;
+import pallet_spring.DTO.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -27,8 +27,8 @@ public class UserService {
     public void signUp(User user) {
 
         // 입력한 Pw 암호화
-        String encodedPassword = passwordEncoder.encode(user.getPw());
-        user.setPw(encodedPassword);
+        String encodedPassword = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encodedPassword);
 
         List<User> userIdList = findAllUserId();
         if (userIdList.isEmpty()) {
@@ -54,16 +54,16 @@ public class UserService {
         return userMapper.getAll();
     }
 
-    public boolean login(LoginDTO loginDTO) {
+    public boolean login(Login login) {
 
-        LoginDTO loginMember = userMapper.login(loginDTO);
+        Login loginMember = userMapper.login(login);
         log.info(String.valueOf(loginMember));
 
         if (loginMember == null ) {
             return false;
         } else {
-            String rawPassword = loginDTO.getPw();
-            String encodedPassword = loginMember.getPw();
+            String rawPassword = login.getPassword();
+            String encodedPassword = loginMember.getPassword();
 
             if (passwordEncoder.matches(rawPassword, encodedPassword)) {
                 return true;
@@ -73,20 +73,24 @@ public class UserService {
         }
     }
 
-
-
     @Value("${jwt.secret}")
     private String secretKey;
 
-    public String jwtLogin(LoginDTO loginDTO) {
+    public String jwtLogin(Login login) {
         // 인증과정 생략
-
-        String userId = loginDTO.getId();
-
+        String userId = login.getId();
         // 유효 시간 1시간
         Long expiredMs = 1000 * 60L;
 
         return JwtUtil.createJwt(userId, secretKey, expiredMs);
+    }
+
+    // user 정보 여부 확인
+    public User checkUser(String id) {
+        log.info("UserId:{}", id);
+        User checkdUser = userMapper.getUserDetail(id);
+        log.info("userCheck:{}", checkdUser);
+        return checkdUser;
     }
 
 

@@ -1,5 +1,6 @@
 package pallet_spring.security;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,12 +15,11 @@ import pallet_spring.service.UserService;
 @Configuration
 @EnableWebSecurity
 public class AuthenticationConfig {
-
+    @Autowired
     private UserService userService;
 
     @Value("${jwt.secret}")
     private String secretKey;
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
@@ -30,7 +30,7 @@ public class AuthenticationConfig {
                 .cors() // CORS 보호를 활성화 (필요하다면 `.configurationSource()`를 사용하여 추가 구성 가능)
                 .and()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST,"/users/signup", "/users/login").permitAll()// /users/signup 경로에 대한 POST 요청은 모두 허용
+                .antMatchers(HttpMethod.POST,"/users/signup", "/users/login", "/users/id/**").permitAll()// /users/signup 경로에 대한 POST 요청은 모두 허용
                 .antMatchers("/**").authenticated() // 다른 경로에 대한 요청 차단
                 .and()
 //                .exceptionHandling().accessDeniedHandler(webAccessDeniedHandler)
