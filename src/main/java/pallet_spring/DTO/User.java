@@ -1,4 +1,4 @@
-package pallet_spring.model;
+package pallet_spring.DTO;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
@@ -23,7 +23,9 @@ public class User {
     private String name;
 
     @NotBlank
-    private String pw;
+    private String password;
+
+    private String role;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss",
             timezone = "Asia/Seoul")
