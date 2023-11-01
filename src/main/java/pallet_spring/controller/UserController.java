@@ -1,7 +1,9 @@
 package pallet_spring.controller;
+import pallet_spring.DTO.Jwt;
 import pallet_spring.mapper.UserMapper;
 import pallet_spring.DTO.Login;
 import pallet_spring.DTO.User;
+import pallet_spring.security.jwt.JwtService;
 import pallet_spring.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,7 +11,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +26,8 @@ public class UserController {
 
     @Autowired
     private UserMapper userMapper;
-
+    @Autowired
+    private JwtService jwtService;
     @Autowired
     private UserService userService;
 
@@ -36,7 +42,7 @@ public class UserController {
         }
     }
     @PostMapping("/login")
-    public Map<String, Object> userLogin(@RequestBody @Valid Login login, BindingResult bindingResult) {
+    public Map<String, Object> userLogin(@RequestBody @Valid Login login, BindingResult bindingResult, HttpServletResponse response) {
         if (bindingResult.hasErrors()) {
             log.error("유효성 검사 오류 발생");
 //            Map<String, String> errors = new HashMap<>();
@@ -52,11 +58,17 @@ public class UserController {
         {
             boolean loginResult = userService.login(login);
             if (loginResult) {
+
                 // jwt create 메소드
-                String token = userService.jwtLogin(login);
-                Map<String, Object> jwtMap = new LinkedHashMap<>();
-                jwtMap.put("token", token);
-                return jwtMap;
+                String userId = login.getId();
+                String accessToken = jwtService.createAccessJwt(userId);
+                String refreshToken = jwtService.createRefreshToken();
+                Cookie cookie = jwtService.createCookie(refreshToken);
+
+                Map<String, Object> token = new HashMap<>();
+                response.addCookie(cookie);
+                token.put("AccessToken", accessToken);
+                return token;
             } else {
                 throw new RuntimeException("가입된 계정이 없습니다.");
             }
