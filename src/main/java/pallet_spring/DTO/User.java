@@ -25,8 +25,6 @@ public class User {
     @NotBlank
     private String password;
 
-    private String role;
-
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss",
             timezone = "Asia/Seoul")
     private Date create_date;

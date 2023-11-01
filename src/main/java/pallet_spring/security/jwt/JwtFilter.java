@@ -50,22 +50,15 @@ public class JwtFilter extends OncePerRequestFilter {
 
             // 토큰 꺼내기
             String token = authorization.split(BEARER_PREFIX)[1];
-
             log.info("token: {}", token);
 
-            // 토큰 expired 되었는지 확인
-//            if (JwtUtil.isExpired(token, secretKey)) {
-//                log.info("Token이 만료되었습니다.");
-//                filterChain.doFilter(request, response);
-//            }
-
             // userId 꺼내서 확인
-            String userId = JwtUtil.getUserId(token, secretKey);
+            String userId = JwtService.getUserId(token, secretKey);
             log.info("userId:{}", userId);
 
 
             log.info(userService.toString());
-            // User 객체 null 뜨는 오류 발생
+
             User user = userService.checkUser(userId);
             log.info("user:{}", user);
             if (user == null) {

@@ -1,2 +1,7 @@
-package pallet_spring.security.jwt;public class JwtExceptionHandler {
+package pallet_spring.security.jwt;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class JwtExceptionHandler {
 }
