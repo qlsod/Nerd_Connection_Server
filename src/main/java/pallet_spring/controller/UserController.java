@@ -1,5 +1,4 @@
 package pallet_spring.controller;
-import pallet_spring.DTO.Jwt;
 import pallet_spring.mapper.UserMapper;
 import pallet_spring.DTO.Login;
 import pallet_spring.DTO.User;
@@ -15,7 +14,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -52,7 +50,6 @@ public class UserController {
 //            }
 
             throw new RuntimeException("NotBlank 조건 충족 못함");
-
         }
         else // 유효성 검사 통과
         {
@@ -63,6 +60,10 @@ public class UserController {
                 String userId = login.getId();
                 String accessToken = jwtService.createAccessJwt(userId);
                 String refreshToken = jwtService.createRefreshToken();
+
+                // 생성한 RefreshToken redis에 저장
+                jwtService.saveRefreshToken(userId, refreshToken);
+
                 Cookie cookie = jwtService.createCookie(refreshToken);
 
                 Map<String, Object> token = new HashMap<>();
@@ -78,6 +79,12 @@ public class UserController {
     @GetMapping("")
     public List<User> getUserList() {
         return userService.findUserList();
+    }
+
+    @GetMapping("/test")
+    public String getToken(@RequestBody Login login) {
+        String userId = login.getId();
+        return jwtService.getRefreshToken(userId);
     }
 
 
