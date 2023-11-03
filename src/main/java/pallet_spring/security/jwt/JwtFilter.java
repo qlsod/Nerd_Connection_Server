@@ -5,7 +5,6 @@ import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -30,43 +29,37 @@ import java.util.Map;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final UserService userService;
+    private final JwtService jwtService;
     private final String secretKey;
-    public static final String BEARER_PREFIX = "Bearer ";
-
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
 
         try {
-            final String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+            // authorization 꺼내기
+            String authorization = jwtService.getAuthorization(request);
 
-            log.info("authorization:{}", authorization);
-
-            // 토큰 안보낼 시 권한 X
+            // authorization 값이 없을 시
             if (authorization == null) {
                 log.error("authorization 이 없습니다.");
                 filterChain.doFilter(request, response);
                 return;
             }
 
-            // 토큰 꺼내기
-            String token = authorization.split(BEARER_PREFIX)[1];
+            // authorization 에서 AccessToken 꺼내기
+            String token = jwtService.getAccessToken(authorization);
             log.info("token: {}", token);
 
-            // userId 꺼내서 확인
-            String userId = JwtService.getUserId(token, secretKey);
-            log.info("userId:{}", userId);
+            // userId 꺼내기
+            String userId = jwtService.getUserId(token, secretKey);
 
-
-            log.info(userService.toString());
-
-            User user = userService.checkUser(userId);
+            User user = userService.checkUserId(userId);
             log.info("user:{}", user);
             if (user == null) {
-                log.info("user가 널일 경우");
+                log.info("user가 null일 경우");
                 // 해당 ID가 DB에 없을 경우
                 throw new JwtException("해당 ID가 DB에 없음");
             } else {
-                log.info("user가 널이 아닐 경우");
+                log.info("user가 null이 아닐 경우");
 
 
 //        // 나중에 관리자 권한 생성 시 할 예정
@@ -78,8 +71,6 @@ public class JwtFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
             }
 
-
-            // 제공하는 오류 수정하기
         } catch (SecurityException e) {
             setErrorResponse(request, response, "JWT 검증 중에 보안 예외 발생");
         } catch (MalformedJwtException e) {

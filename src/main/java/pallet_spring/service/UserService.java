@@ -10,7 +10,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pallet_spring.security.jwt.JwtService;
 import java.util.List;
 
 @Service
@@ -77,7 +76,7 @@ public class UserService {
     private String secretKey;
 
     // user 정보 여부 확인
-    public User checkUser(String id) {
+    public User checkUserId(String id) {
         log.info("UserId:{}", id);
         User checkdUser = userMapper.getUserDetail(id);
         log.info("userCheck:{}", checkdUser);
