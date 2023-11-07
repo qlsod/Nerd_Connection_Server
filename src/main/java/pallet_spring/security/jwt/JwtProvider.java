@@ -17,7 +17,7 @@ import java.util.Date;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class JwtService {
+public class JwtProvider {
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -29,7 +29,7 @@ public class JwtService {
     private final RedisTemplate<String, String> redisTemplate;
 
     // AccessToken 생성
-    public String createAccessJwt(String userId) {
+    public String createAccessToken(String userId) {
         Claims claims = Jwts.claims();
         claims.put("userId", userId);
         return Jwts.builder()
@@ -41,8 +41,11 @@ public class JwtService {
     }
 
     // refreshToken 생성
-    public String createRefreshToken(){
+    public String createRefreshToken(String userId){
+        Claims claims = Jwts.claims();
+        claims.put("userId", userId);
         return Jwts.builder()
+                .setClaims(claims)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + refreshTokenExpiredMs))
                 .signWith(SignatureAlgorithm.HS256, secretKey)
@@ -52,12 +55,38 @@ public class JwtService {
 
     // 생성된 refreshToken redis에 저장
     public void saveRefreshToken(String userId, String refreshToken) {
-        redisTemplate.opsForValue().set(userId, refreshToken, Duration.ofDays(3));
+        redisTemplate.opsForValue().set(userId, refreshToken, Duration.ofDays(14));
         log.info("저장된 Token:{}", redisTemplate.opsForValue().get(userId));
     }
 
-    public String getRefreshToken(String userId) {
+    public void deleteRefreshToken(String userId) {
+        redisTemplate.delete(userId);
+    }
+
+
+
+    // RefreshToken 검사하기
+    public boolean validateRefreshToken(String refreshToken) {
+        String userId = getUserId(refreshToken, secretKey);
+        String refreshTokenFromRedis = findRefreshTokenFromRedis(userId);
+        if (refreshTokenFromRedis != null) {
+            return true;
+        }
+        return false;
+    }
+    public String findRefreshTokenFromRedis(String userId) {
         return redisTemplate.opsForValue().get(userId);
+    }
+
+    public String getRefreshTokenFromCookie(HttpServletRequest request) {
+        Cookie[] requestCookies = request.getCookies();
+        String refreshToken = null;
+        if (requestCookies != null) {
+            for (Cookie cookie : requestCookies) {
+                refreshToken = cookie.getValue();
+            }
+        }
+        return refreshToken;
     }
 
     // user ID 꺼내기
@@ -69,7 +98,6 @@ public class JwtService {
     public Cookie createCookie(String refreshToken){
         String cookieName = "refreshToken";
         Cookie cookie = new Cookie(cookieName, refreshToken);
-
         // Cookie 설정
         cookie.setHttpOnly(true);     // httpOnly 옵션 설정
         cookie.setSecure(true);       // https 옵션 설정
@@ -86,8 +114,4 @@ public class JwtService {
         String BEARER_PREFIX = "Bearer ";
         return authorization.split(BEARER_PREFIX)[1];
     }
-
-
-
-
 }

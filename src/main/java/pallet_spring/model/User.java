@@ -1,4 +1,4 @@
-package pallet_spring.DTO;
+package pallet_spring.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;

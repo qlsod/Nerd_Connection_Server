@@ -1,9 +1,8 @@
 package pallet_spring.service;
 
-import org.springframework.beans.factory.annotation.Value;
 import pallet_spring.mapper.UserMapper;
-import pallet_spring.DTO.Login;
-import pallet_spring.DTO.User;
+import pallet_spring.model.Login;
+import pallet_spring.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -72,15 +71,10 @@ public class UserService {
         }
     }
 
-    @Value("${jwt.secret}")
-    private String secretKey;
 
     // user 정보 여부 확인
     public User checkUserId(String id) {
-        log.info("UserId:{}", id);
-        User checkdUser = userMapper.getUserDetail(id);
-        log.info("userCheck:{}", checkdUser);
-        return checkdUser;
+        return userMapper.getUserDetail(id);
     }
 
 

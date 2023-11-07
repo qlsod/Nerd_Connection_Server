@@ -11,7 +11,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.web.filter.OncePerRequestFilter;
-import pallet_spring.DTO.User;
+import pallet_spring.model.User;
 import pallet_spring.service.UserService;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -29,7 +29,7 @@ import java.util.Map;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final UserService userService;
-    private final JwtService jwtService;
+    private final JwtProvider jwtService;
     private final String secretKey;
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
@@ -48,19 +48,22 @@ public class JwtFilter extends OncePerRequestFilter {
             // authorization 에서 AccessToken 꺼내기
             String token = jwtService.getAccessToken(authorization);
             log.info("token: {}", token);
+            if (token == null) {
+                log.error("token이 존재하지 않습니다.");
+                filterChain.doFilter(request, response);
+            }
 
             // userId 꺼내기
-            String userId = jwtService.getUserId(token, secretKey);
+            final String userId = jwtService.getUserId(token, secretKey);
 
+            // 유효 Id 확인
             User user = userService.checkUserId(userId);
-            log.info("user:{}", user);
             if (user == null) {
                 log.info("user가 null일 경우");
                 // 해당 ID가 DB에 없을 경우
                 throw new JwtException("해당 ID가 DB에 없음");
             } else {
                 log.info("user가 null이 아닐 경우");
-
 
 //        // 나중에 관리자 권한 생성 시 할 예정
 //        String userRole = user.getRole();
@@ -76,7 +79,7 @@ public class JwtFilter extends OncePerRequestFilter {
         } catch (MalformedJwtException e) {
             setErrorResponse(request, response, "유효하지 않은 JWT 형식");
         } catch (ExpiredJwtException e) {
-            setErrorResponse(request, response, "JWT 기한 만료");
+            setErrorResponse(request, response, "만료된 JWT");
         } catch (UnsupportedJwtException e) {
             setErrorResponse(request, response, "지원되지 않는 JWT 형식");
         } catch (SignatureException e) {

@@ -1,6 +1,6 @@
 package pallet_spring.mapper;
-import pallet_spring.DTO.Login;
-import pallet_spring.DTO.User;
+import pallet_spring.model.Login;
+import pallet_spring.model.User;
 import org.apache.ibatis.annotations.*;
 import java.util.List;
 
