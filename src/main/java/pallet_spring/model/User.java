@@ -10,7 +10,7 @@ public class User {
 
     private int no;
 
-    // 유효성 검사
+    // 비어 있지 않은 문자열만 허용
     @NotBlank
     private String id;
 

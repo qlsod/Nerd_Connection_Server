@@ -1,9 +1,8 @@
 package pallet_spring.mapper;
-import pallet_spring.model.Login;
+
 import pallet_spring.model.User;
 import org.apache.ibatis.annotations.*;
 import java.util.List;
-
 
 @Mapper
 public interface UserMapper {
@@ -21,12 +20,9 @@ public interface UserMapper {
     @Select("SELECT * FROM users WHERE no=#{no}")
     User getUserProfile(@Param("no") int no);
 
-    @Select("SELECT * FROM users WHERE id=#{id}")
-    User getUserDetail(@Param("id") String id);
-
     @ResultMap("UserProfileMap")
-    @Select("SELECT id FROM users")
-    List<User> getAllUserId();
+    @Select("SELECT * FROM users WHERE id=#{id}")
+    User findUserDetail(@Param("id") String id);
 
     // GET all
     // property와 column 매칭
@@ -38,10 +34,5 @@ public interface UserMapper {
     })
     @Select("SELECT * FROM users")
     List<User> getAll();
-
-    @Select("SELECT * FROM users WHERE id=#{id}")
-    Login login(Login login);
-
-
 
 }

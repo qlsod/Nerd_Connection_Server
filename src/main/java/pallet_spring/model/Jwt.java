@@ -9,4 +9,6 @@ public class Jwt {
     @NotBlank
     String accessToken;
 
+    @NotBlank
+    String refreshToken;
 }

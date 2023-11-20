@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-
 // lombok 사용하여 생성자 주입(final 붙은 필드)
 @Slf4j
 @RequiredArgsConstructor
@@ -33,6 +32,14 @@ public class JwtFilter extends OncePerRequestFilter {
     private final String secretKey;
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
+
+        String uri = request.getRequestURI();
+
+        // /jwt/refresh에 대해 필터 적용 X
+        if ("/jwt/refresh".equals(uri)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         try {
             // authorization 꺼내기
@@ -54,7 +61,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
             // userId 꺼내기
-            final String userId = jwtService.getUserId(token, secretKey);
+            final String userId = jwtService.getUserIdInJwt(token, secretKey);
 
             // 유효 Id 확인
             User user = userService.checkUserId(userId);
@@ -107,4 +114,5 @@ public class JwtFilter extends OncePerRequestFilter {
         mapper.writeValue(res.getOutputStream(), body);
 
     }
+
 }

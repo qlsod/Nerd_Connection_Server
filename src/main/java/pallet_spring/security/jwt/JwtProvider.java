@@ -1,18 +1,23 @@
 package pallet_spring.security.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import pallet_spring.model.Jwt;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.time.Duration;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +32,22 @@ public class JwtProvider {
     private Long refreshTokenExpiredMs;
 
     private final RedisTemplate<String, String> redisTemplate;
+
+    public Jwt createJwtLogic(String userId) {
+
+        Jwt jwtDTO = new Jwt();
+        // jwt create 메소드
+        String accessToken = createAccessToken(userId);
+        String refreshToken = createRefreshToken(userId);
+
+        // 생성한 RefreshToken redis에 저장
+        saveRefreshToken(userId, refreshToken);
+
+        jwtDTO.setAccessToken(accessToken);
+        jwtDTO.setRefreshToken(refreshToken);
+
+        return jwtDTO;
+    }
 
     // AccessToken 생성
     public String createAccessToken(String userId) {
@@ -66,22 +87,28 @@ public class JwtProvider {
 
 
     // RefreshToken 검사하기
-    public boolean validateRefreshToken(String refreshToken) {
-        String userId = getUserId(refreshToken, secretKey);
-        String refreshTokenFromRedis = findRefreshTokenFromRedis(userId);
-        if (refreshTokenFromRedis != null) {
-            return true;
-        }
+    public boolean validateRefreshToken(HttpServletRequest request) {
         return false;
     }
+
+
+    // 해당 오류 400으로 표시되는 거 수정 필요
     public String findRefreshTokenFromRedis(String userId) {
-        return redisTemplate.opsForValue().get(userId);
+        String refreshTokenFromRedis = redisTemplate.opsForValue().get(userId);
+
+        if (refreshTokenFromRedis == null) {
+            throw new RuntimeException("Redis에 저장되지 않은 토큰");
+        }
+        return refreshTokenFromRedis;
     }
 
     public String getRefreshTokenFromCookie(HttpServletRequest request) {
         Cookie[] requestCookies = request.getCookies();
-        String refreshToken = null;
-        if (requestCookies != null) {
+
+        String refreshToken = "";
+        if (requestCookies == null) {
+            throw new RuntimeException("Cookie가 존재하지 않습니다");
+        } else {
             for (Cookie cookie : requestCookies) {
                 refreshToken = cookie.getValue();
             }
@@ -90,9 +117,47 @@ public class JwtProvider {
     }
 
     // user ID 꺼내기
-    public String getUserId(String token, String secretKey) {
+    public String getUserIdInJwt(String token, String secretKey) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
                 .getBody().get("userId", String.class);
+    }
+
+    public void validateToken(String token, HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        log.info("여기일껄");
+        try {
+            Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
+        } catch (SecurityException e) {
+            setErrorResponse(request, response, "JWT 검증 중에 보안 예외 발생");
+        } catch (MalformedJwtException e) {
+            setErrorResponse(request, response, "유효하지 않은 JWT 형식");
+        } catch (ExpiredJwtException e) {
+            setErrorResponse(request, response, "만료된 JWT");
+        } catch (UnsupportedJwtException e) {
+            setErrorResponse(request, response, "지원되지 않는 JWT 형식");
+        } catch (SignatureException e) {
+            setErrorResponse(request, response, "잘못된 JWT Signature 형식");
+        } catch (IllegalArgumentException e) {
+            setErrorResponse(request, response, "JWT 안에 Id 문자열 없음");
+        }
+    }
+
+    public void setErrorResponse(HttpServletRequest req, HttpServletResponse res, String message) throws IOException {
+
+        res.setContentType(MediaType.APPLICATION_JSON_VALUE);
+
+        final Map<String, Object> body = new HashMap<>();
+
+        // 401 반환
+        res.setStatus(res.SC_UNAUTHORIZED);
+        body.put("status", res.SC_UNAUTHORIZED);
+        body.put("error", "Unauthorized");
+        // message : 입력한 메시지 반환.
+        body.put("message", message);
+        body.put("path", req.getServletPath());
+
+        final ObjectMapper mapper = new ObjectMapper();
+        mapper.writeValue(res.getOutputStream(), body);
     }
 
     public Cookie createCookie(String refreshToken){
