@@ -34,7 +34,6 @@ public class JwtProvider {
     private final RedisTemplate<String, String> redisTemplate;
 
     public Jwt createJwtLogic(String userId) {
-
         Jwt jwtDTO = new Jwt();
         // jwt create 메소드
         String accessToken = createAccessToken(userId);
@@ -117,7 +116,7 @@ public class JwtProvider {
     }
 
     // user ID 꺼내기
-    public String getUserIdInJwt(String token, String secretKey) {
+    public String getUserIdInJwt(String token) {
         return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token)
                 .getBody().get("userId", String.class);
     }
@@ -169,6 +168,15 @@ public class JwtProvider {
         cookie.setPath("/");          // 모든 곳에서 쿠키 열람 가능
         cookie.setMaxAge(60*60*24);   // 쿠키 만료시간 설정
         return cookie;
+    }
+
+    public String getUserIdLogic(HttpServletRequest request) {
+        // Header에서 authorization 꺼내기
+        String authorization = getAuthorization(request);
+        // authorization 에서 AccessToken 꺼내기
+        String token = getAccessToken(authorization);
+        // UserId 꺼내기
+        return getUserIdInJwt(token);
     }
 
     public String getAuthorization(HttpServletRequest request) {
