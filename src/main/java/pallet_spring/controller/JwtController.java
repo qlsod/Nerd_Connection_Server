@@ -47,7 +47,7 @@ public class JwtController {
         jwtProvider.validateToken(refreshToken, request, response);
 
         // refreshToken에서 userId 꺼내기
-        String userId = jwtProvider.getUserIdInJwt(refreshToken, secretKey);
+        String userId = jwtProvider.getUserIdInJwt(refreshToken);
 
         log.info("userId:{}", userId);
         // redis에서 refreshToken 꺼내기
