@@ -28,7 +28,7 @@ import java.util.Map;
 public class JwtFilter extends OncePerRequestFilter {
 
     private final UserService userService;
-    private final JwtProvider jwtService;
+    private final JwtProvider jwtProvider;
     private final String secretKey;
     @Override
     protected void doFilterInternal(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain filterChain) throws ServletException, IOException {
@@ -43,7 +43,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try {
             // authorization 꺼내기
-            String authorization = jwtService.getAuthorization(request);
+            String authorization = jwtProvider.getAuthorization(request);
 
             // authorization 값이 없을 시
             if (authorization == null) {
@@ -53,7 +53,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
             // authorization 에서 AccessToken 꺼내기
-            String token = jwtService.getAccessToken(authorization);
+            String token = jwtProvider.getAccessToken(authorization);
             log.info("token: {}", token);
             if (token == null) {
                 log.error("token이 존재하지 않습니다.");
@@ -61,7 +61,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
 
             // userId 꺼내기
-            final String userId = jwtService.getUserIdInJwt(token, secretKey);
+            final String userId = jwtProvider.getUserIdInJwt(token);
 
             // 유효 Id 확인
             User user = userService.checkUserId(userId);
