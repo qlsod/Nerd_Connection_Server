@@ -1,4 +1,4 @@
-package pallet_spring.DTO;
+package pallet_spring.model;
 
 import lombok.Data;
 import javax.validation.constraints.NotBlank;
