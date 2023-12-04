@@ -2,6 +2,8 @@ package pallet_spring.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
+
+import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import java.util.Date;
 
@@ -12,6 +14,7 @@ public class User {
 
     // 비어 있지 않은 문자열만 허용
     @NotBlank
+    @Email
     private String id;
 
     @NotBlank

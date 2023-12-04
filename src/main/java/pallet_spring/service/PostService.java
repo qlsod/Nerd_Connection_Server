@@ -1,20 +1,22 @@
 package pallet_spring.service;
 
 import com.amazonaws.services.s3.AmazonS3;
-import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import pallet_spring.model.Login;
+import pallet_spring.mapper.PostMapper;
+import pallet_spring.mapper.UserMapper;
+import pallet_spring.model.Image;
+import pallet_spring.model.Post;
 import pallet_spring.model.User;
 import pallet_spring.security.jwt.JwtProvider;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.List;
 
 @Service
 @Slf4j
@@ -28,8 +30,29 @@ public class PostService {
     @Autowired
     private JwtProvider jwtProvider;
 
+    @Autowired
+    private UserMapper userMapper;
+    @Autowired
+    private PostMapper postMapper;
 
-    public void upload(MultipartFile file, String userId) {
+    @Transactional
+    public void postUpload(Post post, String userId) {
+        // 해당 user 정보 불러오기
+        User user = userMapper.findUserDetail(userId);
+
+        if (user == null) {
+            throw new RuntimeException("계정정보가 없습니다");
+        } else {
+            // user_no 값 불러와 postDTO에 저장
+            int userNo = user.getNo();
+            post.setUser_no(userNo);
+        }
+        log.info("userId담은 post :{}", post);
+        postMapper.insertPost(post);
+    }
+
+
+    public String uploadS3(MultipartFile file, String userId) {
 
         // 파일 존재 여부 확인
         validateFileExists(file);
@@ -47,6 +70,14 @@ public class PostService {
             throw new RuntimeException("업로드 실패");
         }
 
+        // 업로드 된 이미지 URL 받기
+        String imageURL = getImageURL(fileName);
+        log.info("imageURL:{}", imageURL);
+        return imageURL;
+    }
+
+    private String getImageURL(String fileName) {
+        return amazonS3.getUrl(bucket, fileName).toString();
     }
 
     private void validateFileExists(MultipartFile multipartFile) {
