@@ -9,13 +9,12 @@ import org.springframework.web.multipart.MultipartFile;
 import pallet_spring.mapper.PostMapper;
 import pallet_spring.mapper.UserMapper;
 import pallet_spring.model.Image;
+import pallet_spring.model.MyImage;
 import pallet_spring.model.Post;
 import pallet_spring.security.jwt.JwtProvider;
 import pallet_spring.service.PostService;
 import pallet_spring.service.UserService;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
@@ -50,7 +49,7 @@ public class PostController {
 
     // 따로 뺄 수도 있음(현재는 post에서만 사용)
     @PostMapping("image")
-    public String postImageUpload(@RequestParam("file") MultipartFile file, HttpServletRequest request, HttpServletResponse response) {
+    public String postImageUpload(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String userId = jwtProvider.getUserIdLogic(request);
@@ -60,8 +59,9 @@ public class PostController {
     }
 
     @PostMapping("upload")
-    public String postUpload(@RequestBody Post post, HttpServletRequest request, HttpServletResponse response) {
+    public String postUpload(@RequestBody Post post, HttpServletRequest request) {
 
+        // 토큰에 저장된 유저 ID 꺼내는 로직
         String userId = jwtProvider.getUserIdLogic(request);
 
         postService.postUpload(post, userId);
@@ -78,6 +78,24 @@ public class PostController {
     @GetMapping("image/{no}")
     public List<Image> returnNextImageURL(@PathVariable("no") int no) {
         return postMapper.getNextImage(no);
+    }
+
+    @GetMapping("myimages/{targetTime}")
+    public List<MyImage> returnMyImageURL(HttpServletRequest request, @PathVariable("targetTime") String targetTime) {
+
+        log.info("myimages시작");
+        // 토큰에 저장된 유저 ID 꺼내는 로직
+        String id = jwtProvider.getUserIdLogic(request);
+
+        log.info("꺼낸 토큰:{}", id);
+
+        // 해당 유저 PK 값 꺼내기
+        int userNo = userMapper.getUserNo(id);
+
+        log.info("pk값 꺼내기 :{}", userNo);
+
+        // 해당 유저의 Image 받아옴
+        return postMapper.getMyImage(userNo, targetTime);
     }
 
 }
