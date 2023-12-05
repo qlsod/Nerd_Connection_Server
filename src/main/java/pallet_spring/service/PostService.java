@@ -11,12 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import pallet_spring.mapper.PostMapper;
 import pallet_spring.mapper.UserMapper;
-import pallet_spring.model.Image;
 import pallet_spring.model.Post;
 import pallet_spring.model.User;
 import pallet_spring.security.jwt.JwtProvider;
 import java.io.IOException;
-import java.util.List;
 
 @Service
 @Slf4j
@@ -58,7 +56,7 @@ public class PostService {
         validateFileExists(file);
 
         // 파일 이름 지정
-        String fileName = "pallet_post/" + userId + "-" + file.getOriginalFilename();
+        String fileName = "pallet_post/" + userId + "/" + file.getOriginalFilename();
 
         ObjectMetadata objMeta = new ObjectMetadata();
         objMeta.setContentType(file.getContentType());

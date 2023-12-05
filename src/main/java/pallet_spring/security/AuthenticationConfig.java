@@ -39,9 +39,10 @@ public class AuthenticationConfig {
                 .cors()// CORS 보호를 활성화 (필요하다면 `.configurationSource()`를 사용하여 추가 구성 가능)
                 .and()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST,"/users/signup", "/users/login").permitAll()// /users/signup 경로에 대한 POST 요청은 모두 허용
-                .antMatchers(HttpMethod.GET,"/users/id/**").permitAll()// /users/signup 경로에 대한 POST 요청은 모두 허용
-                .antMatchers(HttpMethod.POST, "/jwt/refresh").permitAll() // /users/refresh 경로에 대한 POST 요청 모두 허용
+                .antMatchers(HttpMethod.POST,"/users/signup", "/users/login").permitAll()// /users/signup 경로에 대한 POST 요청은 모두 허용(회원가입 용도)
+                .antMatchers(HttpMethod.GET,"/posts/image/**").permitAll()// /users/signup 경로에 대한 POST 요청은 모두 허용
+                .antMatchers(HttpMethod.POST, "/jwt/refresh").permitAll() // /users/refresh 경로에 대한 POST 요청 모두 허용(token 재발급 용도)
+                .antMatchers(HttpMethod.GET,"/users/id/**").permitAll()// /users/id/ 모든 경로에 대한 GET 요청은 모두 허용(TEST 용도)
                 .anyRequest().authenticated() // 다른 경로에 대한 요청 차단
                 .and()
                 .sessionManagement()

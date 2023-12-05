@@ -17,10 +17,6 @@ public interface UserMapper {
 
     // GET
     @ResultMap("UserProfileMap")
-    @Select("SELECT * FROM users WHERE no=#{no}")
-    User getUserProfile(@Param("no") int no);
-
-    @ResultMap("UserProfileMap")
     @Select("SELECT * FROM users WHERE id=#{id}")
     User findUserDetail(@Param("id") String id);
 
@@ -34,5 +30,10 @@ public interface UserMapper {
     })
     @Select("SELECT * FROM users")
     List<User> getAll();
+
+    @Result(property = "no", column = "no")
+    @Result(property = "id", column = "id")
+    @Select("SELECT no FROM users WHERE id=#{id}")
+    int getUserNo(@Param("id") String id);
 
 }
