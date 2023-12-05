@@ -3,9 +3,6 @@ package pallet_spring.mapper;
 import org.apache.ibatis.annotations.*;
 import pallet_spring.model.Image;
 import pallet_spring.model.Post;
-import pallet_spring.model.User;
-
-import java.util.ArrayList;
 import java.util.List;
 
 @Mapper
@@ -18,17 +15,6 @@ public interface PostMapper {
             "(#{post.user_no}, #{post.content}, #{post.photo_url}, #{post.share_check})")
     @Options(useGeneratedKeys = true, keyProperty = "post_no")
     void insertPost(@Param("post") Post post);
-
-//    // GET
-//    @ResultMap("UserProfileMap")
-//    @Select("SELECT * FROM users WHERE no=#{no}")
-//    User getUserProfile(@Param("no") int no);
-//
-//    @ResultMap("UserProfileMap")
-//    @Select("SELECT * FROM users WHERE id=#{id}")
-//    User findUserDetail(@Param("id") String id);
-//
-
 
 
     // 시간 순 정렬하여 url 불러오기
@@ -43,8 +29,19 @@ public interface PostMapper {
             @Result(property = "update_date", column = "update_date"),
             @Result(property = "delete_date", column = "delete_date")
     })
-    @Select("SELECT photo_url FROM posts WHERE share_check = 1 ORDER BY update_date DESC")
+    @Select("SELECT photo_url, post_no FROM posts " +
+            "WHERE share_check = 1 " +
+            "ORDER BY update_date DESC " +
+            "LIMIT 2")
     List<Image> getAll();
+
+    @ResultMap("PostMap")
+    @Select("SELECT photo_url, post_no FROM posts " +
+            "WHERE share_check = 1 " +
+            "AND update_date < (SELECT update_date FROM posts WHERE post_no = #{no}) " +
+            "ORDER BY update_date DESC " +
+            "LIMIT 2")
+    List<Image> getNextImage(@Param("no") int no);
 
 
 }
