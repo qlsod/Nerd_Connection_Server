@@ -98,4 +98,13 @@ public class PostController {
         return postMapper.getMyImage(userNo, targetTime);
     }
 
+    // 해당글 조회
+    @GetMapping("{post_no}")
+    public Post getPostDetail(@PathVariable("post_no") int post_no) {
+        Post post = postMapper.getPostDetail(post_no);
+        if(post == null) {
+            throw new RuntimeException("해당 글이 존재하지 않습니다.");
+        }
+        return post;
+    }
 }
