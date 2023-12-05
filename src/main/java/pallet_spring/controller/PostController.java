@@ -20,7 +20,7 @@ import java.util.List;
 
 @Slf4j
 @RestController
-@RequestMapping("/post")
+@RequestMapping("/posts")
 public class PostController {
 
 
@@ -47,7 +47,9 @@ public class PostController {
     @Autowired
     private UserService userService;
 
-    @PostMapping("image/url")
+
+    // 따로 뺄 수도 있음(현재는 post에서만 사용)
+    @PostMapping("image")
     public String postImageUpload(@RequestParam("file") MultipartFile file, HttpServletRequest request, HttpServletResponse response) {
 
         // 토큰에 저장된 유저 ID 꺼내는 로직
@@ -67,16 +69,15 @@ public class PostController {
     }
 
     // 공유 가능 이미지 불러오기
-    @GetMapping("images")
+    @GetMapping("image/all")
     public List<Image> returnAllImageURL() {
-
-//        List<Image> getImages = postMapper.getAll();
-
-        //----------------------
-        // 페이징 처리 해야 하는 부분
-
-        //----------------------
         return postMapper.getAll();
+    }
+
+    // 마지막 image의 no값 받아 다음 아이템 표시
+    @GetMapping("image/{no}")
+    public List<Image> returnNextImageURL(@PathVariable("no") int no) {
+        return postMapper.getNextImage(no);
     }
 
 }
