@@ -20,6 +20,17 @@ public interface PostMapper {
 
     // 시간 순 정렬하여 url 불러오기
     // property와 column 매칭
+//    @Results(id = "PostMap", value = {
+//            @Result(property = "post_no", column = "post_no"),
+//            @Result(property = "user_no", column = "user_no"),
+//            @Result(property = "content", column = "content"),
+//            @Result(property = "photo_url", column = "photo_url"),
+//            @Result(property = "share_check", column = "share_check"),
+//            @Result(property = "create_date", column = "create_date"),
+//            @Result(property = "update_date", column = "update_date"),
+//            @Result(property = "delete_date", column = "delete_date")
+//    })
+
     @Results(id = "PostMap", value = {
             @Result(property = "post_no", column = "post_no"),
             @Result(property = "user_no", column = "user_no"),
@@ -30,31 +41,35 @@ public interface PostMapper {
             @Result(property = "update_date", column = "update_date"),
             @Result(property = "delete_date", column = "delete_date")
     })
-    @Select("SELECT photo_url, post_no FROM posts " +
+    @Select("SELECT * FROM posts WHERE post_no = #{post_no}")
+    Post getPostDetail(@Param("post_no") int post_no);
+
+
+    @Results(id = "ImageMap", value = {
+            @Result(property = "post_no", column = "post_no"),
+            @Result(property = "photo_url", column = "photo_url")
+    })
+    @Select("SELECT post_no, photo_url FROM posts " +
             "WHERE share_check = 1 " +
             "ORDER BY update_date DESC " +
             "LIMIT 2")
     List<Image> getAll();
 
-    @ResultMap("PostMap")
-    @Select("SELECT photo_url, post_no FROM posts " +
+    @ResultMap("ImageMap")
+    @Select("SELECT post_no, photo_url  FROM posts " +
             "WHERE share_check = 1 " +
             "AND update_date < (SELECT update_date FROM posts WHERE post_no = #{no}) " +
             "ORDER BY update_date DESC " +
             "LIMIT 2")
     List<Image> getNextImage(@Param("no") int no);
 
-    @Results(id = "PostMap2", value = {
+
+    @Results(id = "MyImageMap", value = {
             @Result(property = "post_no", column = "post_no"),
-            @Result(property = "user_no", column = "user_no"),
-            @Result(property = "content", column = "content"),
             @Result(property = "photo_url", column = "photo_url"),
-            @Result(property = "share_check", column = "share_check"),
-            @Result(property = "create_date", column = "create_date"),
             @Result(property = "update_date", column = "update_date"),
-            @Result(property = "delete_date", column = "delete_date")
     })
-    @Select("SELECT photo_url, post_no, posts.update_date FROM users " +
+    @Select("SELECT post_no, photo_url, posts.update_date FROM users " +
             "JOIN posts On users.no = posts.user_no " +
             "WHERE users.no = #{userNo} " +
             "AND DATE_FORMAT(posts.update_date, '%Y-%m') = #{targetTime} " +
