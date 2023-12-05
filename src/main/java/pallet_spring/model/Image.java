@@ -12,7 +12,5 @@ public class Image {
     @NotBlank
     private String photo_url;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss",
-            timezone = "Asia/Seoul")
-    private Date update_date;
+    private int post_no;
 }
