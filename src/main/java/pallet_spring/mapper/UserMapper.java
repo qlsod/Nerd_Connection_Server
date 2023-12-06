@@ -24,6 +24,8 @@ public interface UserMapper {
     // property와 column 매칭
     @Results(id = "UserProfileMap", value = {
             @Result(property = "no", column = "no"),
+            @Result(property = "name", column = "name"),
+            @Result(property = "password", column = "password"),
             @Result(property = "create_date", column = "create_date"),
             @Result(property = "update_date", column = "update_date"),
             @Result(property = "delete_date", column = "delete_date")
