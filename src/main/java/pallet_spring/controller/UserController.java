@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 import java.util.HashMap;
@@ -66,9 +67,6 @@ public class UserController {
 
     }
 
-    @PostMapping("/logout")
-
-
     @GetMapping("")
     public List<User> getUserList() {
         return userService.findUserList();
@@ -80,5 +78,20 @@ public class UserController {
     public String signup(@RequestBody @Valid User user) {
         userService.signUp(user);
         return "회원가입 성공";
+    }
+
+
+    @DeleteMapping("/logout")
+    public String logout(HttpServletRequest request, HttpServletResponse response) {
+        // 토큰에 저장된 유저 ID 꺼내는 로직
+        String id = jwtProvider.getUserIdLogic(request);
+
+        // Redis에 저장된 RefreshToken 토큰 삭제
+        jwtProvider.deleteRefreshToken(id);
+
+        // Cookie에 저장된 RefreshToken 토큰 삭제
+        userService.deleteCookie(response);
+
+        return "로그아웃 성공";
     }
 }
