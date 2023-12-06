@@ -15,7 +15,9 @@ import pallet_spring.security.jwt.JwtProvider;
 import pallet_spring.service.PostService;
 import pallet_spring.service.UserService;
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -49,13 +51,18 @@ public class PostController {
 
     // 따로 뺄 수도 있음(현재는 post에서만 사용)
     @PostMapping("image")
-    public String postImageUpload(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
+    public Map<String, Object> postImageUpload(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String userId = jwtProvider.getUserIdLogic(request);
 
         // S3 upload
-        return postService.uploadS3(file, userId);
+        String photo_url = postService.uploadS3(file, userId);
+
+        Map<String, Object> url = new HashMap<>();
+        url.put("photo_url", photo_url);
+
+        return url;
     }
 
     @PostMapping("upload")
@@ -65,6 +72,7 @@ public class PostController {
         String userId = jwtProvider.getUserIdLogic(request);
 
         postService.postUpload(post, userId);
+
         return "성공";
     }
 
@@ -83,16 +91,11 @@ public class PostController {
     @GetMapping("myimages/{targetTime}")
     public List<MyImage> returnMyImageURL(HttpServletRequest request, @PathVariable("targetTime") String targetTime) {
 
-        log.info("myimages시작");
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String id = jwtProvider.getUserIdLogic(request);
 
-        log.info("꺼낸 토큰:{}", id);
-
         // 해당 유저 PK 값 꺼내기
         int userNo = userMapper.getUserNo(id);
-
-        log.info("pk값 꺼내기 :{}", userNo);
 
         // 해당 유저의 Image 받아옴
         return postMapper.getMyImage(userNo, targetTime);
