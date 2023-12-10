@@ -15,6 +15,7 @@ import pallet_spring.security.jwt.JwtProvider;
 import pallet_spring.service.PostService;
 import pallet_spring.service.UserService;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -50,7 +51,7 @@ public class PostController {
 
 
     // 따로 뺄 수도 있음(현재는 post에서만 사용)
-    @PostMapping("image")
+    @PostMapping("upload/image")
     public Map<String, Object> postImageUpload(@RequestParam("file") MultipartFile file, HttpServletRequest request) {
 
         // 토큰에 저장된 유저 ID 꺼내는 로직
@@ -66,7 +67,7 @@ public class PostController {
     }
 
     @PostMapping("upload")
-    public String postUpload(@RequestBody Post post, HttpServletRequest request) {
+    public String postUpload(@RequestBody @Valid Post post, HttpServletRequest request) {
 
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String userId = jwtProvider.getUserIdLogic(request);
