@@ -12,7 +12,6 @@ public class Post {
     private int post_no;
     private int user_no;
 
-    @NotBlank
     private String content;
 
     @NotBlank

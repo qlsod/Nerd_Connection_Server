@@ -10,6 +10,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pallet_spring.security.jwt.JwtProvider;
+
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
 @Service
@@ -74,6 +78,18 @@ public class UserService {
         if (!passwordEncoder.matches(rawPW, encodedPw)) {
             throw new RuntimeException("입력한 비밀번호가 맞지 않습니다");
         }
+    }
+
+    public void deleteCookie(HttpServletResponse response) {
+
+        Cookie cookie = new Cookie("refreshToken", null);
+
+        // 쿠키의 expiration 타임을 0으로 하여 없앤다.
+        cookie.setMaxAge(0);
+
+        // 모든 경로에서 삭제 됬음을 알린다.
+        cookie.setPath("/");
+        response.addCookie(cookie);
     }
 
 }
