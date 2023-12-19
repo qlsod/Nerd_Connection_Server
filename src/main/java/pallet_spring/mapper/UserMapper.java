@@ -1,5 +1,6 @@
 package pallet_spring.mapper;
 
+import pallet_spring.model.SignUpDTO;
 import pallet_spring.model.User;
 import org.apache.ibatis.annotations.*;
 import java.util.List;
@@ -12,8 +13,8 @@ public interface UserMapper {
     @Insert("INSERT INTO users(id, name, password)" +
             "VALUES" +
             "(#{signUp.id}, #{signUp.name}, #{signUp.password})")
-    @Options(useGeneratedKeys = true, keyProperty = "no")
-    void insertUserProfile(@Param("signUp") User user);
+//    @Options(useGeneratedKeys = true, keyProperty = "no")
+    void insertUserProfile(@Param("signUp") SignUpDTO user);
 
     // GET
     @ResultMap("UserProfileMap")
