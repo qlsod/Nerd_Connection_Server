@@ -1,7 +1,6 @@
 package pallet_spring.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -10,6 +9,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import pallet_spring.mapper.UserMapper;
 import pallet_spring.model.Jwt;
 import pallet_spring.model.Login;
+import pallet_spring.model.SignUpDTO;
 import pallet_spring.model.User;
 import pallet_spring.model.response.LoginRes;
 import pallet_spring.security.jwt.JwtProvider;
@@ -51,8 +51,6 @@ public class UserController {
     @PostMapping("/login")
     @Operation(summary = "로그인 화면",
             description = "가입된 유저인지 확인하고 AccessToken, RefreshToken 발급")
-    @Parameter(name = "id", description = "유저 ID 값", required = true)
-    @Parameter(name = "password", description = "유저 PW", required = true)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공 + Cookie로 RefreshToken 담아줌(신경 X)",
                     content = {@Content(schema = @Schema(implementation = LoginRes.class))})
@@ -97,25 +95,19 @@ public class UserController {
     @PostMapping("/signup")
     @Operation(summary = "회원가입",
             description = "가입된 유저인지 확인하고 최초 가입 시 DB 저장")
-    @Parameter(name = "id", description = "유저 ID 값", required = true)
-    @Parameter(name = "password", description = "유저 PW", required = true)
-    @Parameter(name = "name", description = "유저 이름", required = true)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "201", description = "성공"),
             @ApiResponse(responseCode = "400", description = "실패")
     })
-    public String signup(@RequestBody @Valid User user) {
+    public void signup(@RequestBody @Valid SignUpDTO user, HttpServletResponse response) {
         userService.signUp(user);
-        return "회원가입 성공";
+        response.setStatus(HttpServletResponse.SC_CREATED);
     }
 
 
     @DeleteMapping("/logout")
     @Operation(summary = "로그아웃",
             description = "토큰 확인하여 Cookie에 저장된 refreshToken 삭제")
-    @Parameter(name = "id", description = "유저 ID 값", required = true)
-    @Parameter(name = "password", description = "유저 PW", required = true)
-    @Parameter(name = "name", description = "유저 이름", required = true)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "실패")
