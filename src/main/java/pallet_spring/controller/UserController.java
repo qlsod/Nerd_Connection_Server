@@ -6,6 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import pallet_spring.mapper.UserMapper;
 import pallet_spring.model.Jwt;
 import pallet_spring.model.Login;
@@ -49,16 +51,16 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "로그인 화면",
+    @Operation(summary = "로그인",
             description = "가입된 유저인지 확인하고 AccessToken, RefreshToken 발급")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공 + Cookie로 RefreshToken 담아줌(신경 X)",
-                    content = {@Content(schema = @Schema(implementation = LoginRes.class))})
+            @ApiResponse(responseCode = "200", description = "성공 + Cookie로 RefreshToken 담아줌(신경 X)"),
+            @ApiResponse(responseCode = "400", description = "실패")
 //                    content = {
 //                            @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = MemberRes.class)))
 //                    })
     })
-    public Map<String, Object> login(@RequestBody @Valid Login login, HttpServletResponse response) {
+    public ResponseEntity<LoginRes> login(@RequestBody @Valid Login login, HttpServletResponse response) {
 
         log.info("여기 요청 옴");
 
@@ -73,14 +75,14 @@ public class UserController {
         String refreshToken = jwtDTO.getRefreshToken();
 
         // AccessToken -> body에 담아 반환
-        Map<String, Object> token = new HashMap<>();
-        token.put("accessToken", accessToken);
+        LoginRes loginRes = new LoginRes();
+        loginRes.setAccessToken(accessToken);
 
         // RefreshToken -> cookie 에 담아 반환
         Cookie cookie = jwtProvider.createCookie(refreshToken);
         response.addCookie(cookie);
 
-        return token;
+        return new ResponseEntity<>(loginRes, HttpStatus.OK);
 
     }
 

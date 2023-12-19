@@ -11,6 +11,6 @@ public class Login {
     private String id;
 
     @NotBlank
-    @Schema(description = "사용자 password", example = "pw1")
+    @Schema(description = "사용자 password", example = "pw111")
     private String password;
 }

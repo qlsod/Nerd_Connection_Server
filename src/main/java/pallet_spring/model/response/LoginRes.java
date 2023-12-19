@@ -7,9 +7,7 @@ import lombok.Data;
 @Schema(description = "/user/login API 응답")
 public class LoginRes {
 
-    @Schema(description = "사용자 id", example = "sdlafjdsklfj")
+    @Schema(example = "eyJhbGciOiJIUzI1NiJ9.eyJ1c2VySWQiOiJpZDJAbmF2ZXIuY29tIiwiaWF0IjoxNzAyOTY5OTQxLCJleHAiOjE3MDI5NzU5NDF9.1szB4PqjUPRDg72mjdcE5GS5fZnks3008MUYiHTnASY")
     String accessToken;
 
 }
-
-
