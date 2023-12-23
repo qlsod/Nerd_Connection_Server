@@ -2,6 +2,7 @@ package pallet_spring.service;
 
 import pallet_spring.mapper.UserMapper;
 import pallet_spring.model.Login;
+import pallet_spring.model.SignUpDTO;
 import pallet_spring.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +30,7 @@ public class UserService {
     private JwtProvider jwtProvider;
 
     @Transactional
-    public void signUp(User user) {
+    public void signUp(SignUpDTO user) {
 
         // ID 중복 체크
         String userId = user.getId();

@@ -1,15 +1,18 @@
 package pallet_spring.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.apache.tomcat.util.bcel.classfile.Constant;
+import org.springdoc.core.Constants;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import pallet_spring.mapper.UserMapper;
 import pallet_spring.model.Jwt;
 import pallet_spring.model.Login;
+import pallet_spring.model.SignUpDTO;
 import pallet_spring.model.User;
 import pallet_spring.model.response.LoginRes;
 import pallet_spring.security.jwt.JwtProvider;
@@ -21,9 +24,7 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Slf4j
 @RestController
@@ -49,18 +50,16 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    @Operation(summary = "로그인 화면",
+    @Operation(summary = "로그인",
             description = "가입된 유저인지 확인하고 AccessToken, RefreshToken 발급")
-    @Parameter(name = "id", description = "유저 ID 값", required = true)
-    @Parameter(name = "password", description = "유저 PW", required = true)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공 + Cookie로 RefreshToken 담아줌(신경 X)",
-                    content = {@Content(schema = @Schema(implementation = LoginRes.class))})
+            @ApiResponse(responseCode = "200", description = "성공 + Cookie로 RefreshToken 담아줌(신경 X)"),
+            @ApiResponse(responseCode = "400", description = "실패")
 //                    content = {
 //                            @Content(mediaType = "application/json", array = @ArraySchema(schema = @Schema(implementation = MemberRes.class)))
 //                    })
     })
-    public Map<String, Object> login(@RequestBody @Valid Login login, HttpServletResponse response) {
+    public ResponseEntity<LoginRes> login(@RequestBody @Valid Login login, HttpServletResponse response) {
 
         log.info("여기 요청 옴");
 
@@ -75,14 +74,14 @@ public class UserController {
         String refreshToken = jwtDTO.getRefreshToken();
 
         // AccessToken -> body에 담아 반환
-        Map<String, Object> token = new HashMap<>();
-        token.put("accessToken", accessToken);
+        LoginRes loginRes = new LoginRes();
+        loginRes.setAccessToken(accessToken);
 
         // RefreshToken -> cookie 에 담아 반환
         Cookie cookie = jwtProvider.createCookie(refreshToken);
         response.addCookie(cookie);
 
-        return token;
+        return new ResponseEntity<>(loginRes, HttpStatus.OK);
 
     }
 
@@ -97,30 +96,24 @@ public class UserController {
     @PostMapping("/signup")
     @Operation(summary = "회원가입",
             description = "가입된 유저인지 확인하고 최초 가입 시 DB 저장")
-    @Parameter(name = "id", description = "유저 ID 값", required = true)
-    @Parameter(name = "password", description = "유저 PW", required = true)
-    @Parameter(name = "name", description = "유저 이름", required = true)
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "201", description = "회원가입 성공"),
             @ApiResponse(responseCode = "400", description = "실패")
     })
-    public String signup(@RequestBody @Valid User user) {
+    public ResponseEntity<Void> signup(@RequestBody @Valid SignUpDTO user) {
         userService.signUp(user);
-        return "회원가입 성공";
+        return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
 
     @DeleteMapping("/logout")
     @Operation(summary = "로그아웃",
             description = "토큰 확인하여 Cookie에 저장된 refreshToken 삭제")
-    @Parameter(name = "id", description = "유저 ID 값", required = true)
-    @Parameter(name = "password", description = "유저 PW", required = true)
-    @Parameter(name = "name", description = "유저 이름", required = true)
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "실패")
     })
-    public String logout(HttpServletRequest request, HttpServletResponse response) {
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String id = jwtProvider.getUserIdLogic(request);
 
@@ -129,7 +122,6 @@ public class UserController {
 
         // Cookie에 저장된 RefreshToken 토큰 삭제
         userService.deleteCookie(response);
-
-        return "로그아웃 성공";
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
