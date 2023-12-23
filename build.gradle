@@ -27,9 +27,10 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	implementation 'org.jetbrains:annotations:24.0.0'
 	implementation 'org.springframework.security:spring-security-crypto:5.7.1'
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.9'
+
 	implementation 'mysql:mysql-connector-java:8.0.28'
 	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
-
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 	testImplementation('org.springframework.boot:spring-boot-starter-test') {
 		exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
