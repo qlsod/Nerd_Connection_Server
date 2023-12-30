@@ -52,8 +52,6 @@ public class PostService {
 
     public String uploadS3(MultipartFile file, String userId) {
 
-        // 파일 존재 여부 확인
-        validateFileExists(file);
 
         // 파일 이름 지정
         String fileName = "pallet_post/" + userId + "/" + file.getOriginalFilename();
@@ -78,8 +76,8 @@ public class PostService {
         return amazonS3.getUrl(bucket, fileName).toString();
     }
 
-    private void validateFileExists(MultipartFile multipartFile) {
-        if (multipartFile.isEmpty()) {
+    public void validateFileExists(MultipartFile multipartFile) {
+        if (multipartFile.isEmpty() || !multipartFile.getName().equals("file")) {
             throw new RuntimeException("파일이 존재하지 않습니다");
         }
     }

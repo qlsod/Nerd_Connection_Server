@@ -52,7 +52,7 @@ public interface PostMapper {
     @Select("SELECT post_no, photo_url FROM posts " +
             "WHERE share_check = 1 " +
             "ORDER BY update_date DESC " +
-            "LIMIT 2")
+            "LIMIT 18")
     List<Image> getAll();
 
     @ResultMap("ImageMap")
@@ -60,7 +60,7 @@ public interface PostMapper {
             "WHERE share_check = 1 " +
             "AND update_date < (SELECT update_date FROM posts WHERE post_no = #{no}) " +
             "ORDER BY update_date DESC " +
-            "LIMIT 2")
+            "LIMIT 18")
     List<Image> getNextImage(@Param("no") int no);
 
 
