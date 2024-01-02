@@ -1,5 +1,10 @@
 package pallet_spring.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +25,7 @@ import java.util.Map;
 @Slf4j
 @RestController
 @RequestMapping("/jwt")
+@Tag(name = "Jwt", description = "refreshToken 사용 관련 api")
 public class JwtController {
 
     @Autowired
@@ -36,6 +42,13 @@ public class JwtController {
     private Long refreshTokenExpiredMs;
 
     @PostMapping("/refresh")
+    @Operation(summary = "accessToken 재발급",
+            description = "쿠키에 있는 refreshToken 꺼내서 검증 후 새로운 accessToken 발급")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @SecurityRequirement(name = "accessToken")
     public Map<String, Object> refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
         Map<String, Object> token = new HashMap<>();
