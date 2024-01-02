@@ -32,8 +32,10 @@ public class SwaggerConfig {
 
         // SecuritySecheme명
         String jwtSchemeName = "accessToken";
-        // API 요청헤더에 인증정보 포함
-        SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwtSchemeName);
+
+        // 모든 API 요청헤더에 인증정보 포함
+        // SecurityRequirement securityRequirement = new SecurityRequirement().addList(jwtSchemeName);
+
         // SecuritySchemes 등록
         Components components = new Components()
                 .addSecuritySchemes(jwtSchemeName, new SecurityScheme()
@@ -46,7 +48,8 @@ public class SwaggerConfig {
 
         return new OpenAPI()
                 .info(info)
-                .addSecurityItem(securityRequirement)
+                // 모든 API 요청헤더에 인증정보 포함
+                // .addSecurityItem(securityRequirement)
                 .components(components);
     }
 }
