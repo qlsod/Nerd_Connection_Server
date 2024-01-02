@@ -2,7 +2,6 @@ package pallet_spring.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -65,6 +64,7 @@ public class PostController {
             @ApiResponse(responseCode = "201", description = "저장 성공"),
             @ApiResponse(responseCode = "400", description = "실패")
     })
+    @SecurityRequirement(name = "accessToken")
     public ResponseEntity<ImageRes> postImageUpload(
             @Parameter(description = "이미지 form-data 형식으로 담아 키값 이름 file로 설정하여 요청")
             @RequestParam(name = "file", required = false) MultipartFile file, HttpServletRequest request) {
@@ -91,6 +91,7 @@ public class PostController {
             @ApiResponse(responseCode = "201", description = "저장 성공"),
             @ApiResponse(responseCode = "400", description = "실패")
     })
+    @SecurityRequirement(name = "accessToken")
     public ResponseEntity<Void> postUpload(@RequestBody @Valid Post post, HttpServletRequest request) {
 
         // 토큰에 저장된 유저 ID 꺼내는 로직
