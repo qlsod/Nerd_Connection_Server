@@ -161,7 +161,7 @@ public class PostController {
             @ApiResponse(responseCode = "400", description = "실패")
     })
     public Post getPostDetail(
-            @Parameter(description = "해당 post_no 입력", example = "2023-12")
+            @Parameter(description = "해당 post_no 입력", example = "3")
             @PathVariable("post_no") int post_no) {
         Post post = postMapper.getPostDetail(post_no);
         if(post == null) {
