@@ -17,6 +17,15 @@ public interface PostMapper {
     @Options(useGeneratedKeys = true, keyProperty = "post_no")
     void insertPost(@Param("post") Post post);
 
+    @Update("UPDATE posts " +
+            "SET content = #{post.content}, " +
+            "photo_url = #{post.photo_url}, " +
+            "share_check = #{post.share_check}, " +
+            "update_date = NOW() " +
+            "WHERE post_no = #{post.post_no}")
+    void updatePost(@Param("post") Post post);
+
+
 
     // 시간 순 정렬하여 url 불러오기
     // property와 column 매칭
