@@ -164,9 +164,68 @@ public class PostController {
             @Parameter(description = "해당 post_no 입력", example = "3")
             @PathVariable("post_no") int post_no) {
         Post post = postMapper.getPostDetail(post_no);
-        if(post == null) {
+        if (post == null) {
             throw new RuntimeException("해당 글이 존재하지 않습니다.");
         }
         return post;
     }
+
+    @PatchMapping("upload/image/{post_no}")
+    @Operation(summary = "S3 이미지 교체",
+            description = "S3 저장된 이미지 URL 수정")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @SecurityRequirement(name = "accessToken")
+    public ResponseEntity<ImageRes> updatedUpload(
+            @Parameter(description = "해당글 no 입력")
+            @PathVariable("post_no") int post_no, HttpServletRequest request,
+            @Parameter(description = "새로운 이미지 form-data 형식으로 담아 키값 이름 file로 설정하여 요청") MultipartFile file) {
+
+        // 토큰에 저장된 유저 ID 꺼내는 로직
+        String userId = jwtProvider.getUserIdLogic(request);
+
+        Post postEntity = postMapper.getPostDetail(post_no);
+        String photo_url = postEntity.getPhoto_url();
+
+        log.info("post_no에 해당하는 url:{}", photo_url);
+
+        String keyName = photo_url.substring(53);
+
+        log.info("post_no에 해당하는 key:{}", keyName);
+        postService.deleteS3(keyName);
+
+        // S3 upload
+        String newPhoto_url = postService.uploadS3(file, userId);
+
+        ImageRes imageRes = new ImageRes();
+        imageRes.setPhoto_url(newPhoto_url);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(imageRes);
+
+    }
+
+    @PatchMapping("upload/{post_no}")
+    @Operation(summary = "다이어리 게시글 수정",
+            description = "이미지 URL 받아 게시글과 함께 저장")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "저장 성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @SecurityRequirement(name = "accessToken")
+    public ResponseEntity<Void> patchUpload(@RequestBody @Valid Post post, HttpServletRequest request,
+                                            @PathVariable("post_no") int post_no) {
+
+        // 토큰에 저장된 유저 ID 꺼내는 로직
+        String userId = jwtProvider.getUserIdLogic(request);
+
+        post.setPost_no(post_no);
+        postService.postUpdate(post, userId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+
 }
