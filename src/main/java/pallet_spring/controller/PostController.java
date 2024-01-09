@@ -57,7 +57,7 @@ public class PostController {
 
 
     // 따로 뺄 수도 있음(현재는 post에서만 사용)
-    @PostMapping("upload/image")
+    @PostMapping("image")
     @Operation(summary = "이미지 URL 반환",
             description = "이미지 S3 저장 후 URL 반환")
     @ApiResponses(value = {
@@ -84,7 +84,7 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.CREATED).body(imageRes);
     }
 
-    @PostMapping("upload")
+    @PostMapping("")
     @Operation(summary = "다이어리 게시글 저장",
             description = "이미지 URL 받아 게시글과 함께 저장")
     @ApiResponses(value = {
@@ -103,7 +103,7 @@ public class PostController {
     }
 
     // 공유 가능 이미지 불러오기
-    @GetMapping("image/all")
+    @GetMapping("share-images/first")
     @Operation(summary = "공유 가능 이미지 불러오기 처음 시도하는 api",
             description = "공유 체크한 이미지 불러오기(페이징 처리로 인한 18개 제한)")
     @ApiResponses(value = {
@@ -115,7 +115,7 @@ public class PostController {
     }
 
     // 마지막 image의 no값 받아 다음 아이템 표시
-    @GetMapping("image/{no}")
+    @GetMapping("share-images/{no}")
     @Operation(summary = "공유가능 이미지 불러오기 두번째 부터",
             description = "첫번째 api에서 반환된 post_no 중 가장 마지막 post_no 입력받아 다음 이미지 표시")
     @ApiResponses(value = {
@@ -170,7 +170,7 @@ public class PostController {
         return post;
     }
 
-    @PatchMapping("upload/image/{post_no}")
+    @PatchMapping("image/{post_no}")
     @Operation(summary = "S3 이미지 교체",
             description = "S3 저장된 이미지 URL 수정")
     @ApiResponses(value = {
@@ -206,7 +206,7 @@ public class PostController {
 
     }
 
-    @PatchMapping("upload/{post_no}")
+    @PatchMapping("{post_no}")
     @Operation(summary = "다이어리 게시글 수정",
             description = "이미지 URL 받아 게시글과 함께 저장")
     @ApiResponses(value = {
