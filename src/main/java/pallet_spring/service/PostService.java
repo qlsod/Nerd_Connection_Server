@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
 import pallet_spring.mapper.PostMapper;
 import pallet_spring.mapper.UserMapper;
 import pallet_spring.model.Post;
-import pallet_spring.model.PostDTO;
 import pallet_spring.model.User;
 import pallet_spring.security.jwt.JwtProvider;
 import java.io.IOException;
