@@ -138,7 +138,7 @@ public class PostController {
     })
     @SecurityRequirement(name = "accessToken")
     public List<MyImage> returnMyImageURL(
-            @Parameter(description = "해당 연도, 월 입력", example = "2023-12")
+            @Parameter(description = "해당 연도, 월 입력", example = "2024-01")
             @PathVariable("targetTime") String targetTime,
             HttpServletRequest request) {
 
