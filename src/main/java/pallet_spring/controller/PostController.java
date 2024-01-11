@@ -18,6 +18,7 @@ import pallet_spring.mapper.UserMapper;
 import pallet_spring.model.Image;
 import pallet_spring.model.MyImage;
 import pallet_spring.model.Post;
+import pallet_spring.model.PostDTO;
 import pallet_spring.model.response.ImageRes;
 import pallet_spring.security.jwt.JwtProvider;
 import pallet_spring.service.PostService;
@@ -92,12 +93,12 @@ public class PostController {
             @ApiResponse(responseCode = "400", description = "실패")
     })
     @SecurityRequirement(name = "accessToken")
-    public ResponseEntity<Void> postUpload(@RequestBody @Valid Post post, HttpServletRequest request) {
+    public ResponseEntity<Void> postUpload(@RequestBody @Valid PostDTO postDTO, HttpServletRequest request) {
 
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String userId = jwtProvider.getUserIdLogic(request);
 
-        postService.postUpload(post, userId);
+        postService.postUpload(postDTO, userId);
 
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
@@ -138,7 +139,7 @@ public class PostController {
     })
     @SecurityRequirement(name = "accessToken")
     public List<MyImage> returnMyImageURL(
-            @Parameter(description = "해당 연도, 월 입력", example = "2023-12")
+            @Parameter(description = "해당 연도, 월 입력", example = "2024-01")
             @PathVariable("targetTime") String targetTime,
             HttpServletRequest request) {
 
@@ -214,14 +215,13 @@ public class PostController {
             @ApiResponse(responseCode = "400", description = "실패")
     })
     @SecurityRequirement(name = "accessToken")
-    public ResponseEntity<Void> patchUpload(@RequestBody @Valid Post post, HttpServletRequest request,
+    public ResponseEntity<Void> patchUpload(@RequestBody @Valid PostDTO postDTO, HttpServletRequest request,
                                             @PathVariable("post_no") int post_no) {
 
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String userId = jwtProvider.getUserIdLogic(request);
 
-        post.setPost_no(post_no);
-        postService.postUpdate(post, userId);
+        postService.postUpdate(postDTO, post_no, userId);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import pallet_spring.mapper.PostMapper;
 import pallet_spring.mapper.UserMapper;
 import pallet_spring.model.Post;
+import pallet_spring.model.PostDTO;
 import pallet_spring.model.User;
 import pallet_spring.security.jwt.JwtProvider;
 import java.io.IOException;
@@ -38,20 +39,33 @@ public class PostService {
     private PostMapper postMapper;
 
     @Transactional
-    public void postUpload(Post post, String userId) {
+    public void postUpload(PostDTO postDTO, String userId) {
 
         // userNo 받아오기
-        Post postDTO = getUserNo(post, userId);
-        postMapper.insertPost(postDTO);
+        int userNo = getUserNo(userId);
+
+        Post post = toEntity(postDTO, userNo);
+
+        postMapper.insertPost(post);
     }
 
-    public void postUpdate(Post post, String userId) {
+    public void postUpdate(PostDTO postDTO, int post_no, String userId) {
         // userNo 받아오기
-        Post postDTO = getUserNo(post, userId);
-        postMapper.updatePost(postDTO);
+        int userNo = getUserNo(userId);
+        Post post = toEntity(postDTO, userNo);
+        post.setPost_no(post_no);
+        postMapper.updatePost(post);
     }
 
-    public Post getUserNo(Post post, String userId) {
+    public static Post toEntity(PostDTO dto, int userNo) {
+        Post entity = new Post();
+        entity.setContent(dto.getContent());
+        entity.setUser_no(userNo);
+        entity.setPhoto_url(dto.getPhoto_url());
+        entity.setShare_check(dto.isShare_check());
+        return entity;
+    }
+    public int getUserNo(String userId) {
         // 해당 user 정보 불러오기
         User user = userMapper.findUserDetail(userId);
 
@@ -59,9 +73,7 @@ public class PostService {
             throw new RuntimeException("계정정보가 없습니다");
         } else {
             // user_no 값 불러와 postDTO에 저장
-            int userNo = user.getNo();
-            post.setUser_no(userNo);
-            return post;
+            return user.getNo();
         }
     }
 
