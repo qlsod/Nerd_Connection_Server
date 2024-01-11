@@ -13,6 +13,7 @@ import pallet_spring.model.Login;
 import pallet_spring.model.SignUpDTO;
 import pallet_spring.model.User;
 import pallet_spring.model.response.LoginRes;
+import pallet_spring.model.response.MyPageRes;
 import pallet_spring.security.jwt.JwtProvider;
 import pallet_spring.service.UserService;
 import lombok.extern.slf4j.Slf4j;
@@ -37,13 +38,25 @@ public class UserController {
     private UserService userService;
 
     // Data 조회 시 Get
-    @GetMapping("/id/{id}")
-    public User getUser(@PathVariable("id") String id) {
-        User user = userMapper.findUserDetail(id);
-        if (user == null) {
+    @GetMapping("/mypage")
+    @Operation(summary = "마이페이지",
+            description = "사용자 정보 표시")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @SecurityRequirement(name = "accessToken")
+    public ResponseEntity<MyPageRes> getUser(HttpServletRequest request) {
+
+        // 토큰에 저장된 유저 ID 꺼내는 로직
+        String userId = jwtProvider.getUserIdLogic(request);
+
+        MyPageRes myPageRes = userMapper.getMyPage(userId);
+        if (myPageRes == null) {
             throw new RuntimeException("계정정보가 없습니다");
         } else {
-            return user;
+            return ResponseEntity.status(HttpStatus.OK).body(myPageRes);
+
         }
     }
 

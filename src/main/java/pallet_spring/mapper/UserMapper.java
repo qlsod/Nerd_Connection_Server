@@ -3,6 +3,8 @@ package pallet_spring.mapper;
 import pallet_spring.model.SignUpDTO;
 import pallet_spring.model.User;
 import org.apache.ibatis.annotations.*;
+import pallet_spring.model.response.MyPageRes;
+
 import java.util.List;
 
 @Mapper
@@ -20,6 +22,11 @@ public interface UserMapper {
     @ResultMap("UserProfileMap")
     @Select("SELECT * FROM users WHERE id=#{id}")
     User findUserDetail(@Param("id") String id);
+
+    @Result(property = "id", column = "id")
+    @Result(property = "name", column = "name")
+    @Select("SELECT id, name FROM users WHERE id=#{id}")
+    MyPageRes getMyPage(String id);
 
     // GET all
     // property와 column 매칭
