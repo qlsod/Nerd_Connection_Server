@@ -1,12 +1,11 @@
 package pallet_spring.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
-
+import lombok.ToString;
 import javax.validation.constraints.NotBlank;
-import java.util.Date;
 
 @Data
+@ToString
 public class PostDTO {
 
     private String content;
@@ -15,5 +14,7 @@ public class PostDTO {
     private String photo_url;
 
     private boolean share_check;
+
+
 
 }
