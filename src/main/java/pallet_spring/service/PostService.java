@@ -43,9 +43,9 @@ public class PostService {
 
         // userNo 받아오기
         int userNo = getUserNo(userId);
-
+        log.info("1");
         Post post = toEntity(postDTO, userNo);
-
+        log.info("2");
         postMapper.insertPost(post);
     }
 
