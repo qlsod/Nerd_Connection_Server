@@ -99,7 +99,7 @@ public class PostController {
         String userId = jwtProvider.getUserIdLogic(request);
 
         postService.postUpload(postDTO, userId);
-
+        log.info("3");
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
