@@ -95,8 +95,12 @@ public class PostController {
     @SecurityRequirement(name = "accessToken")
     public ResponseEntity<Void> postUpload(@RequestBody @Valid PostDTO postDTO, HttpServletRequest request) {
 
+        log.info("여기 시작");
+
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String userId = jwtProvider.getUserIdLogic(request);
+
+        log.info("토큰 ID 꺼내기 완료");
 
         postService.postUpload(postDTO, userId);
         log.info("3");
