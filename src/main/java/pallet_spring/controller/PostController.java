@@ -131,6 +131,7 @@ public class PostController {
             @Parameter(description = "마지막 post_no 값", example = "1")
             @PathVariable("no") int no) {
 
+        log.info("접속 test");
         return postMapper.getNextImage(no);
     }
 
