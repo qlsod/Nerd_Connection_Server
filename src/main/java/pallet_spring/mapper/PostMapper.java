@@ -78,12 +78,20 @@ public interface PostMapper {
             @Result(property = "photo_url", column = "photo_url"),
             @Result(property = "update_date", column = "update_date"),
     })
-    @Select("SELECT post_no, photo_url, posts.update_date FROM users " +
+    @Select("SELECT post_no, photo_url, content FROM users " +
             "JOIN posts On users.no = posts.user_no " +
             "WHERE users.no = #{userNo} " +
-            "AND DATE_FORMAT(posts.update_date, '%Y-%m') = #{targetTime} " +
+            "AND DATE_FORMAT(posts.update_date, '%Y-%m-%d') = #{targetTime} " +
             "ORDER BY update_date ASC")
     List<MyImage> getMyImage(@Param("userNo") int userNo, @Param("targetTime") String targetTime);
+
+    // update_date 포함 sql문
+//    @Select("SELECT post_no, photo_url, posts.update_date, content FROM users " +
+//            "JOIN posts On users.no = posts.user_no " +
+//            "WHERE users.no = #{userNo} " +
+//            "AND DATE_FORMAT(posts.update_date, '%Y-%m-%d') = #{targetTime} " +
+//            "ORDER BY update_date ASC")
+//    List<MyImage> getMyImage(@Param("userNo") int userNo, @Param("targetTime") String targetTime);
 
 
 }

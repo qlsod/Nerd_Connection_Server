@@ -136,15 +136,15 @@ public class PostController {
     }
 
     @GetMapping("myimages/{targetTime}")
-    @Operation(summary = "달력에 표시할 이미지 불러오기",
-            description = "해당 월의 작성된 이미지 불러오기")
+    @Operation(summary = "해당 날짜에 작성된 글 불러오기",
+            description = "해당 날짜의 작성된 글 불러오기")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "실패")
     })
     @SecurityRequirement(name = "accessToken")
     public List<MyImage> returnMyImageURL(
-            @Parameter(description = "해당 연도, 월 입력", example = "2024-01")
+            @Parameter(description = "해당 연도, 월, 일 입력", example = "2024-02-26")
             @PathVariable("targetTime") String targetTime,
             HttpServletRequest request) {
 
