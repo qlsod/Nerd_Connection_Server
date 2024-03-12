@@ -81,6 +81,7 @@ public interface PostMapper {
     @Select("SELECT post_no, photo_url, content FROM users " +
             "JOIN posts On users.no = posts.user_no " +
             "WHERE users.no = #{userNo} " +
+            "AND DATE_FORMAT(posts.update_date, '%Y-%m-%d') = #{targetTime} " +
             "ORDER BY posts.update_date ASC")
     List<MyImage> getMyImage(@Param("userNo") int userNo, @Param("targetTime") String targetTime);
 
