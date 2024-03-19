@@ -4,6 +4,8 @@ import org.apache.ibatis.annotations.*;
 import pallet_spring.model.Image;
 import pallet_spring.model.MyImage;
 import pallet_spring.model.Post;
+import pallet_spring.model.response.PostTimeRes;
+
 import java.util.List;
 
 @Mapper
@@ -72,7 +74,6 @@ public interface PostMapper {
             "LIMIT 18")
     List<Image> getNextImage(@Param("no") int no);
 
-
     @Results(id = "MyImageMap", value = {
             @Result(property = "post_no", column = "post_no"),
             @Result(property = "photo_url", column = "photo_url"),
@@ -84,6 +85,13 @@ public interface PostMapper {
             "AND DATE_FORMAT(posts.update_date, '%Y-%m-%d') = #{targetTime} " +
             "ORDER BY posts.update_date ASC")
     List<MyImage> getMyImage(@Param("userNo") int userNo, @Param("targetTime") String targetTime);
+
+    @Results(id = "MyPostTime", value = {
+            @Result(property = "update_date", column = "update_date"),
+    })
+    @Select("SELECT update_date FROM posts WHERE user_no = #{userNo} AND DATE_FORMAT(posts.update_date, '%Y-%m') = #{targetTime}")
+    List<PostTimeRes> getPostTime(@Param("userNo") int userNo, @Param("targetTime") String targetTime);
+
 
     // update_date 포함 sql문
 //    @Select("SELECT post_no, photo_url, posts.update_date, content FROM users " +

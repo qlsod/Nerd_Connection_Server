@@ -15,8 +15,12 @@ import pallet_spring.mapper.UserMapper;
 import pallet_spring.model.Post;
 import pallet_spring.model.PostDTO;
 import pallet_spring.model.User;
+import pallet_spring.model.response.PostTimeRes;
 import pallet_spring.security.jwt.JwtProvider;
+
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -56,6 +60,29 @@ public class PostService {
         post.setPost_no(post_no);
         postMapper.updatePost(post);
     }
+
+    public List<PostTimeRes> RemoveDuplicates(List<PostTimeRes> postTimeList) {
+        Set<String> uniqueDates = new HashSet<>();
+        List<PostTimeRes> uniquePosts = new ArrayList<>();
+
+        for (PostTimeRes postTime : postTimeList) {
+            String dateWithoutTime = getDateWithoutTime((Date) postTime.getUpdate_date());
+            if (!uniqueDates.contains(dateWithoutTime)) {
+                uniqueDates.add(dateWithoutTime);
+                uniquePosts.add(postTime);
+            }
+        }
+
+        log.info(uniquePosts.toString());
+        return uniquePosts;
+    }
+
+    private String getDateWithoutTime(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+        return sdf.format(date);
+    }
+
+
 
     public static Post toEntity(PostDTO dto, int userNo) {
         Post entity = new Post();

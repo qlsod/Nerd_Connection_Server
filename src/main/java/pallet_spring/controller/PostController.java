@@ -20,9 +20,11 @@ import pallet_spring.model.MyImage;
 import pallet_spring.model.Post;
 import pallet_spring.model.PostDTO;
 import pallet_spring.model.response.ImageRes;
+import pallet_spring.model.response.PostTimeRes;
 import pallet_spring.security.jwt.JwtProvider;
 import pallet_spring.service.PostService;
 import pallet_spring.service.UserService;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.List;
@@ -157,6 +159,34 @@ public class PostController {
         // 해당 유저의 Image 받아옴
         return postMapper.getMyImage(userNo, targetTime);
     }
+
+
+    @GetMapping("calendar/{targetTime}")
+    @Operation(summary = "해당 월에 작성된 글 날짜 불러오기",
+            description = "해당 년/월에 작성된 글 표시하기 위한 날짜 불러오기")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @SecurityRequirement(name = "accessToken")
+    public List<PostTimeRes> returnPostTime(
+            @Parameter(description = "해당 연도, 월 입력", example = "2024-02")
+            @PathVariable("targetTime") String targetTime,
+            HttpServletRequest request) {
+
+        // 토큰에 저장된 유저 ID 꺼내는 로직
+        String id = jwtProvider.getUserIdLogic(request);
+
+        // 해당 유저 PK 값 꺼내기
+        int userNo = userMapper.getUserNo(id);
+
+        // 해당 유저가 targetTime에 작성한 글의 날짜 받아옴
+        List<PostTimeRes> postTimeList = postMapper.getPostTime(userNo, targetTime);
+
+        // 중복 제거
+        return postService.RemoveDuplicates(postTimeList);
+    }
+
 
     // 해당글 조회
     @GetMapping("{post_no}")
