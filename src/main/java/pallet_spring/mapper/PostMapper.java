@@ -55,6 +55,13 @@ public interface PostMapper {
     @Select("SELECT * FROM posts WHERE post_no = #{post_no}")
     Post getPostDetail(@Param("post_no") int post_no);
 
+    @ResultMap("PostMap")
+    @Select("SELECT photo_url FROM posts WHERE post_no = #{post_no}")
+    Post getPostUrl(@Param("post_no") int post_no);
+
+    @ResultMap("PostMap")
+    @Select("DELETE FROM posts WHERE post_no = #{post_no}")
+    void deletePost(@Param("post_no") int post_no);
 
     @Results(id = "ImageMap", value = {
             @Result(property = "post_no", column = "post_no"),
@@ -82,14 +89,14 @@ public interface PostMapper {
     @Select("SELECT post_no, photo_url, content FROM users " +
             "JOIN posts On users.no = posts.user_no " +
             "WHERE users.no = #{userNo} " +
-            "AND DATE_FORMAT(posts.update_date, '%Y-%m-%d') = #{targetTime} " +
-            "ORDER BY posts.update_date ASC")
+            "AND DATE_FORMAT(posts.create_date, '%Y-%m-%d') = #{targetTime} " +
+            "ORDER BY posts.create_date ASC")
     List<MyImage> getMyImage(@Param("userNo") int userNo, @Param("targetTime") String targetTime);
 
     @Results(id = "MyPostTime", value = {
-            @Result(property = "update_date", column = "update_date"),
+            @Result(property = "create_date", column = "create_date"),
     })
-    @Select("SELECT update_date FROM posts WHERE user_no = #{userNo} AND DATE_FORMAT(posts.update_date, '%Y-%m') = #{targetTime}")
+    @Select("SELECT create_date FROM posts WHERE user_no = #{userNo} AND DATE_FORMAT(posts.create_date, '%Y-%m') = #{targetTime}")
     List<PostTimeRes> getPostTime(@Param("userNo") int userNo, @Param("targetTime") String targetTime);
 
 
