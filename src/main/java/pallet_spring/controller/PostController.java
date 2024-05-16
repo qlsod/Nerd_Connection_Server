@@ -133,7 +133,6 @@ public class PostController {
             @Parameter(description = "마지막 post_no 값", example = "1")
             @PathVariable("no") int no) {
 
-        log.info("접속 test");
         return postMapper.getNextImage(no);
     }
 
@@ -190,7 +189,7 @@ public class PostController {
 
     // 해당글 조회
     @GetMapping("{post_no}")
-    @Operation(summary = "달력에 표시된 이미지의 상세내용 불러오기",
+    @Operation(summary = "달력에 표시된 이미지의 상세 내용 불러오기",
             description = "해당 게시글의 상세내용 표시")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
@@ -214,7 +213,7 @@ public class PostController {
             @ApiResponse(responseCode = "400", description = "실패")
     })
     @SecurityRequirement(name = "accessToken")
-    public ResponseEntity<ImageRes> updatedUpload(
+    public ResponseEntity<ImageRes> PatchImage(
             @Parameter(description = "해당글 no 입력")
             @PathVariable("post_no") int post_no, HttpServletRequest request,
             @Parameter(description = "새로운 이미지 form-data 형식으로 담아 키값 이름 file로 설정하여 요청") MultipartFile file) {
@@ -222,14 +221,10 @@ public class PostController {
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String userId = jwtProvider.getUserIdLogic(request);
 
-        Post postEntity = postMapper.getPostDetail(post_no);
-        String photo_url = postEntity.getPhoto_url();
-
-        log.info("post_no에 해당하는 url:{}", photo_url);
+        Post postDTO = postMapper.getPostDetail(post_no);
+        String photo_url = postDTO.getPhoto_url();
 
         String keyName = photo_url.substring(53);
-
-        log.info("post_no에 해당하는 key:{}", keyName);
         postService.deleteS3(keyName);
 
         // S3 upload
@@ -261,6 +256,32 @@ public class PostController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @DeleteMapping("{post_no}")
+    @Operation(summary = "다이어리 게시글 삭제",
+            description = "post_no 받아 해당 글 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @SecurityRequirement(name = "accessToken")
+    public ResponseEntity<Void> DeletePost(HttpServletRequest request, @PathVariable("post_no") int post_no) {
 
+        // 토큰에 저장된 유저 ID 꺼내는 로직
+        String userId = jwtProvider.getUserIdLogic(request);
+
+        // post_no 해당 이미지 S3에서 삭제
+        Post postDTO = postMapper.getPostUrl(post_no);
+        if (postDTO == null ) {
+            throw new RuntimeException("해당 글이 존재하지 않습니다");
+        }
+        String photo_url = postDTO.getPhoto_url();
+        String keyName = photo_url.substring(53);
+        postService.deleteS3(keyName);
+
+        // post_no 해당 글 삭제
+        postMapper.deletePost(post_no);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 
 }
