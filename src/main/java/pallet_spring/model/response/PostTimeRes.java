@@ -12,6 +12,6 @@ public class PostTimeRes {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd",
             timezone = "Asia/Seoul")
-    private Date update_date;
+    private Date create_date;
 
 }

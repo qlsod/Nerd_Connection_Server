@@ -66,7 +66,7 @@ public class PostService {
         List<PostTimeRes> uniquePosts = new ArrayList<>();
 
         for (PostTimeRes postTime : postTimeList) {
-            String dateWithoutTime = getDateWithoutTime((Date) postTime.getUpdate_date());
+            String dateWithoutTime = getDateWithoutTime((Date) postTime.getCreate_date());
             if (!uniqueDates.contains(dateWithoutTime)) {
                 uniqueDates.add(dateWithoutTime);
                 uniquePosts.add(postTime);
