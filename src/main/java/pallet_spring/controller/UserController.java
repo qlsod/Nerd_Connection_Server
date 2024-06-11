@@ -5,20 +5,19 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import pallet_spring.mapper.PostMapper;
 import pallet_spring.mapper.UserMapper;
-import pallet_spring.model.Jwt;
-import pallet_spring.model.Login;
-import pallet_spring.model.SignUpDTO;
-import pallet_spring.model.User;
+import pallet_spring.model.*;
 import pallet_spring.model.response.LoginRes;
 import pallet_spring.model.response.MyPageRes;
 import pallet_spring.security.jwt.JwtProvider;
 import pallet_spring.service.UserService;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,27 +35,48 @@ public class UserController {
     private JwtProvider jwtProvider;
     @Autowired
     private UserService userService;
+    @Autowired
+    private PostMapper postMapper;
 
     // Data 조회 시 Get
     @GetMapping("/mypage")
     @Operation(summary = "마이페이지",
-            description = "사용자 정보 표시")
+            description = "사용자 정보, 내가 쓴 글 표시")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "실패")
     })
     @SecurityRequirement(name = "accessToken")
-    public ResponseEntity<MyPageRes> getUser(HttpServletRequest request) {
+    public ResponseEntity<MyPageRes> getUserDetail(HttpServletRequest request) {
 
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String userId = jwtProvider.getUserIdLogic(request);
 
-        MyPageRes myPageRes = userMapper.getMyPage(userId);
-        if (myPageRes == null) {
-            throw new RuntimeException("계정정보가 없습니다");
-        } else {
+        try {
+            int userNo = userMapper.getUserNo(userId);
+
+            log.info(String.valueOf(userNo));
+            // Id, name 불러옴
+            MyProfileDTO myProfile = userMapper.getMyProfile(userNo);
+
+            /** 총 좋아요 수 , 총 게시물 등록 수 불러오기
+             *  해당 부분 users 테이블에 컬럼으로 등록해야 함
+             *  현재 게시물을 count하여 불러오는 중
+             */
+            MyProfileTotalCountDTO myProfileTotalCountDTO = postMapper.getTotalPosts(userNo);
+            List<Image> image = postMapper.getMyPosts(userNo);
+            MyPageRes myPageRes = new MyPageRes();
+            myPageRes.myProfileToResDto(myProfile);
+
+            // 해당 부분 교체 필요
+            myPageRes.myProfileTotalCountToResDto(myProfileTotalCountDTO);
+
+            myPageRes.imageToResDto(image);
+
             return ResponseEntity.status(HttpStatus.OK).body(myPageRes);
 
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 
