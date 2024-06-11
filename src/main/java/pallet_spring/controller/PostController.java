@@ -15,10 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import pallet_spring.mapper.PostMapper;
 import pallet_spring.mapper.UserMapper;
-import pallet_spring.model.Image;
-import pallet_spring.model.MyImage;
-import pallet_spring.model.Post;
-import pallet_spring.model.PostDTO;
+import pallet_spring.model.*;
 import pallet_spring.model.response.ImageRes;
 import pallet_spring.model.response.PostTimeRes;
 import pallet_spring.security.jwt.JwtProvider;
@@ -203,6 +200,25 @@ public class PostController {
             throw new RuntimeException("해당 글이 존재하지 않습니다.");
         }
         return post;
+    }
+
+
+    // 해당글 feed에서 조회
+    @GetMapping("feed/{post_no}")
+    @Operation(summary = "피드에서 이미지의 상세 내용 불러오기",
+            description = "해당 게시글의 상세내용 표시")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    public ResponseEntity<FeedDetail> getFeedDetail(
+            @Parameter(description = "해당 post_no 입력", example = "3")
+            @PathVariable("post_no") int post_no) {
+        FeedDetail feedDetail = postMapper.getFeedDetail(post_no);
+        if (feedDetail == null) {
+            throw new RuntimeException("해당 글이 존재하지 않습니다.");
+        }
+        return ResponseEntity.status(HttpStatus.OK).body(feedDetail);
     }
 
     @PatchMapping("image/{post_no}")
