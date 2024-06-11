@@ -1,9 +1,7 @@
 package pallet_spring.mapper;
 
 import org.apache.ibatis.annotations.*;
-import pallet_spring.model.Image;
-import pallet_spring.model.MyImage;
-import pallet_spring.model.Post;
+import pallet_spring.model.*;
 import pallet_spring.model.response.PostTimeRes;
 
 import java.util.List;
@@ -54,6 +52,27 @@ public interface PostMapper {
     })
     @Select("SELECT * FROM posts WHERE post_no = #{post_no}")
     Post getPostDetail(@Param("post_no") int post_no);
+
+
+    @Results(id = "FeedDetailMap", value = {
+            @Result(property = "post_no", column = "post_no"),
+            @Result(property = "content", column = "content"),
+            @Result(property = "photo_url", column = "photo_url"),
+            @Result(property = "create_date", column = "create_date")
+    })
+    @Select("SELECT content, photo_url, create_date FROM posts WHERE post_no = #{post_no}")
+    FeedDetail getFeedDetail(@Param("post_no") int post_no);
+
+
+
+    @Select("SELECT SUM(like_count) AS total_like_count, COUNT(user_no) AS total_post_count FROM posts WHERE user_no = #{user_no}")
+    MyProfileTotalCountDTO getTotalPosts(@Param("user_no") int user_no);
+
+    @Result(property = "user_no", column = "user_no")
+    @Result(property = "photo_url", column = "photo_url")
+    @Result(property = "post_no", column = "post_no")
+    @Select("SELECT photo_url, post_no FROM posts WHERE user_no = #{user_no}")
+    List<Image> getMyPosts(@Param("user_no") int user_no);
 
     @ResultMap("PostMap")
     @Select("SELECT photo_url FROM posts WHERE post_no = #{post_no}")
