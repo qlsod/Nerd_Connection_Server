@@ -1,9 +1,9 @@
 package pallet_spring.mapper;
 
+import org.apache.ibatis.annotations.*;
+import pallet_spring.model.MyProfileDTO;
 import pallet_spring.model.SignUpDTO;
 import pallet_spring.model.User;
-import org.apache.ibatis.annotations.*;
-import pallet_spring.model.response.MyPageRes;
 
 import java.util.List;
 
@@ -23,10 +23,31 @@ public interface UserMapper {
     @Select("SELECT * FROM users WHERE id=#{id}")
     User findUserDetail(@Param("id") String id);
 
-    @Result(property = "id", column = "id")
-    @Result(property = "name", column = "name")
-    @Select("SELECT id, name FROM users WHERE id=#{id}")
-    MyPageRes getMyPage(String id);
+    @Results(id = "UserProfile", value = {
+            @Result(property = "no", column = "no"),
+            @Result(property = "name", column = "name"),
+            @Result(property = "id", column = "id")
+    })
+    @Select("SELECT id, name FROM users WHERE no = #{no}")
+    MyProfileDTO getMyProfile(@Param("no") int no);
+
+
+
+
+
+    @Select("SELECT photo_url, post_no FROM posts WHERE user_no = #{userNo}")
+    List<String> getPhotoUrlsByUserId(@Param("userNo") int userNo);
+
+//    @Results(id = "UserProfileDetailMap", value = {
+//            @Result(property = "no", column = "no"),
+//            @Result(property = "name", column = "name"),
+//            @Result(property = "photo_url", column = "photo_url"),
+//            @Result(property = "post_no", column = "post_no"),
+//            @Result(property = "user_no", column = "user_no"),
+//            @Result(property = "id", column = "id")
+//    })
+//    @Select("SELECT id, name, photo_url, post_no FROM users Join posts ON users.no = posts.user_no WHERE users.no = #{no}")
+//    MyPageRes getMyPage(@Param("no") int no);
 
     // GET all
     // property와 column 매칭
