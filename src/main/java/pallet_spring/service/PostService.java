@@ -140,6 +140,13 @@ public class PostService {
         heartMapper.insertHeart(heartDto);
     }
 
+    @Transactional
+    public void decreaseLikeCount(HeartDto heartDto) {
+        postMapper.decreaseLikeCount(heartDto.getPost_no());
+        userMapper.decreaseTotalLikeCount(heartDto.getUser_no());
+        heartMapper.deleteHeart(heartDto);
+    }
+
     // post_no에 해당 하는 게시글의 like_count 가져와 해당 게시글의 존재 여부 확인
     public void validatePost(int post_no) {
 

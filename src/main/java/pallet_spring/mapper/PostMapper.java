@@ -56,6 +56,9 @@ public interface PostMapper {
     @Update("UPDATE posts SET like_count = like_count + 1 WHERE post_no = #{post_no}")
     void increaseLikeCount(@Param("post_no") int post_no);
 
+    @Update("UPDATE posts SET like_count = like_count - 1 WHERE post_no = #{post_no}")
+    void decreaseLikeCount(@Param("post_no") int post_no);
+
 
     @Select("SELECT COUNT(*) > 0 FROM posts WHERE post_no = #{post_no}")
     boolean validatePost(@Param("post_no") int post_no);

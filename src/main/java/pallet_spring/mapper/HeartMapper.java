@@ -15,4 +15,7 @@ public interface HeartMapper {
             "(#{heart.user_no}, #{heart.post_no})")
     void insertHeart(@Param("heart") HeartDto heartDto);
 
+    @Delete("DELETE FROM hearts WHERE user_no = #{heart.user_no} AND post_no = #{heart.post_no}")
+    void deleteHeart(@Param("heart") HeartDto heartDto);
+
 }

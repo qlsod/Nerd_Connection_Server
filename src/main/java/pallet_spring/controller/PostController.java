@@ -204,8 +204,8 @@ public class PostController {
     }
 
 
-    // 좋아요 표시
-    @Operation(summary = "좋아요 표시",
+    // 좋아요 표시 + 1
+    @Operation(summary = "좋아요 표시 +1",
             description = "사용자의 좋아요 표시 버튼 클릭")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "성공"),
@@ -213,7 +213,7 @@ public class PostController {
     })
     @SecurityRequirement(name = "accessToken")
     @PostMapping("/heart/{post_no}")
-    public ResponseEntity<Void> insertHeart(
+    public ResponseEntity<Void> increaseHeart(
             @Parameter(description = "해당 post_no 입력", example = "3")
             @PathVariable("post_no") int post_no, HttpServletRequest request) {
 
@@ -239,6 +239,49 @@ public class PostController {
             postService.increaseLikeCount(heartDto);
 
             return new ResponseEntity<>(HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
+    // 좋아요 표시 - 1
+    @Operation(summary = "좋아요 표시 -1",
+            description = "사용자의 좋아요 표시 버튼 클릭 취소")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @SecurityRequirement(name = "accessToken")
+    @DeleteMapping("/heart/{post_no}")
+    public ResponseEntity<Void> decreaseHeart(
+            @Parameter(description = "해당 post_no 입력", example = "3")
+            @PathVariable("post_no") int post_no, HttpServletRequest request) {
+
+        try {
+            // 토큰에 저장된 유저 ID 꺼내는 로직
+            String userId = jwtProvider.getUserIdLogic(request);
+
+            // 해당 게시글 유무 확인
+            postService.validatePost(post_no);
+
+            int user_no = userService.getUserNo(userId);
+
+            HeartDto heartDto = new HeartDto(user_no, post_no);
+
+            // 해당 게시물에 토큰 유저의 좋아요 표시 유무 확인
+            boolean checkLike = heartMapper.checkLikeUser(userId, post_no);
+
+            if (!checkLike) {
+                throw new RuntimeException("해당 게시글에 누르지 않은 상태입니다.");
+            }
+
+            // 좋아요 -1
+            postService.decreaseLikeCount(heartDto);
+
+            return new ResponseEntity<>(HttpStatus.OK);
 
         } catch (Exception e) {
             throw new RuntimeException(e);
