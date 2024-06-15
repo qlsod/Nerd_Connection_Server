@@ -98,15 +98,12 @@ public class PostController {
     @SecurityRequirement(name = "accessToken")
     public ResponseEntity<Void> postUpload(@RequestBody @Valid PostDTO postDTO, HttpServletRequest request) {
 
-        log.info("여기 시작");
-
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String userId = jwtProvider.getUserIdLogic(request);
 
-        log.info("토큰 ID 꺼내기 완료");
-
         postService.postUpload(postDTO, userId);
-        log.info("3");
+
+
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
@@ -356,6 +353,10 @@ public class PostController {
 
         // post_no 해당 글 삭제
         postMapper.deletePost(post_no);
+
+        // user의 총 게시글 개수 -1
+        int userNo = userService.getUserNo(userId);
+        userMapper.decreaseTotalPostCount(userNo);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

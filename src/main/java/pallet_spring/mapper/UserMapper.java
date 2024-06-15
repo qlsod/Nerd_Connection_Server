@@ -34,6 +34,12 @@ public interface UserMapper {
     @Update("UPDATE users SET total_like_count = total_like_count + 1 WHERE no = #{user_no}")
     void increaseTotalLikeCount(@Param("user_no") int user_no);
 
+    @Update("UPDATE users SET total_post_count = total_post_count + 1 WHERE no = #{user_no}")
+    void increaseTotalPostCount(@Param("user_no") int user_no);
+
+    @Update("UPDATE users SET total_post_count = total_post_count - 1 WHERE no = #{user_no}")
+    void decreaseTotalPostCount(@Param("user_no") int user_no);
+
     @Select("SELECT photo_url, post_no FROM posts WHERE user_no = #{userNo}")
     List<String> getPhotoUrlsByUserId(@Param("userNo") int userNo);
 

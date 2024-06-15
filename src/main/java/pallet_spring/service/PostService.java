@@ -53,10 +53,11 @@ public class PostService {
 
         // userNo 받아오기
         int userNo = userService.getUserNo(userId);
-        log.info("1");
+
         Post post = toEntity(postDTO, userNo);
-        log.info("2");
+
         postMapper.insertPost(post);
+        userMapper.increaseTotalPostCount(userNo);
     }
 
     public void postUpdate(PostDTO postDTO, int post_no, String userId) {
