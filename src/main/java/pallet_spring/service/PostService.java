@@ -136,14 +136,14 @@ public class PostService {
     @Transactional
     public void increaseLikeCount(HeartDto heartDto) {
         postMapper.increaseLikeCount(heartDto.getPost_no());
-        userMapper.increaseTotalLikeCount(heartDto.getUser_no());
+        userMapper.increaseTotalLikeCount(heartDto.getPost_no());
         heartMapper.insertHeart(heartDto);
     }
 
     @Transactional
     public void decreaseLikeCount(HeartDto heartDto) {
         postMapper.decreaseLikeCount(heartDto.getPost_no());
-        userMapper.decreaseTotalLikeCount(heartDto.getUser_no());
+        userMapper.decreaseTotalLikeCount(heartDto.getPost_no());
         heartMapper.deleteHeart(heartDto);
     }
 
