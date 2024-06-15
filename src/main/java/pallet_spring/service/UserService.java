@@ -1,19 +1,18 @@
 package pallet_spring.service;
 
-import pallet_spring.mapper.UserMapper;
-import pallet_spring.model.Login;
-import pallet_spring.model.SignUpDTO;
-import pallet_spring.model.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pallet_spring.mapper.UserMapper;
+import pallet_spring.model.Login;
+import pallet_spring.model.SignUpDTO;
+import pallet_spring.model.User;
 import pallet_spring.security.jwt.JwtProvider;
 
 import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.List;
 
@@ -68,6 +67,20 @@ public class UserService {
             checkUserPW(rawPassword, encodedPassword);
         }
     }
+
+
+    public int getUserNo(String userId) {
+        // 해당 user 정보 불러오기
+        User user = userMapper.findUserDetail(userId);
+
+        if (user == null) {
+            throw new RuntimeException("계정정보가 없습니다");
+        } else {
+            // user_no 값 불러와 postDTO에 저장
+            return user.getNo();
+        }
+    }
+
 
     // user 정보 여부 확인
     public User checkUserId(String id) {
