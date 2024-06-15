@@ -13,6 +13,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import pallet_spring.mapper.HeartMapper;
 import pallet_spring.mapper.PostMapper;
 import pallet_spring.mapper.UserMapper;
 import pallet_spring.model.*;
@@ -48,6 +49,9 @@ public class PostController {
 
     @Autowired
     private PostMapper postMapper;
+
+    @Autowired
+    private HeartMapper heartMapper;
 
     @Autowired
     private UserMapper userMapper;
@@ -203,21 +207,77 @@ public class PostController {
     }
 
 
+    // 좋아요 표시
+    @Operation(summary = "좋아요 표시",
+            description = "사용자의 좋아요 표시 버튼 클릭")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "201", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @SecurityRequirement(name = "accessToken")
+    @PostMapping("/heart/{post_no}")
+    public ResponseEntity<Void> insertHeart(
+            @Parameter(description = "해당 post_no 입력", example = "3")
+            @PathVariable("post_no") int post_no, HttpServletRequest request) {
+
+        try {
+            // 토큰에 저장된 유저 ID 꺼내는 로직
+            String userId = jwtProvider.getUserIdLogic(request);
+
+            // 해당 게시글 유무 확인
+            postService.validatePost(post_no);
+
+            int user_no = userService.getUserNo(userId);
+
+            HeartDto heartDto = new HeartDto(user_no, post_no);
+
+            // 해당 게시물에 토큰 유저의 좋아요 표시 유무 확인
+            boolean checkLike = heartMapper.checkLikeUser(userId, post_no);
+
+            if (checkLike) {
+                throw new RuntimeException("해당 게시글에 이미 좋아요를 누른 상태입니다.");
+            }
+
+            // 좋아요 +1
+            postService.increaseLikeCount(heartDto);
+
+            return new ResponseEntity<>(HttpStatus.CREATED);
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+
+
     // 해당글 feed에서 조회
-    @GetMapping("feed/{post_no}")
     @Operation(summary = "피드에서 이미지의 상세 내용 불러오기",
             description = "해당 게시글의 상세내용 표시")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "실패")
     })
+    @SecurityRequirement(name = "accessToken")
+    @GetMapping("feed/{post_no}")
     public ResponseEntity<FeedDetail> getFeedDetail(
             @Parameter(description = "해당 post_no 입력", example = "3")
-            @PathVariable("post_no") int post_no) {
+            @PathVariable("post_no") int post_no, HttpServletRequest request) {
+
+
+        // 토큰에 저장된 유저 ID 꺼내는 로직
+        String id = jwtProvider.getUserIdLogic(request);
+
         FeedDetail feedDetail = postMapper.getFeedDetail(post_no);
         if (feedDetail == null) {
             throw new RuntimeException("해당 글이 존재하지 않습니다.");
         }
+
+        // 해당 게시물에 토큰 유저의 좋아요 표시 유무 확인
+        boolean checkLike = heartMapper.checkLikeUser(id, post_no);
+
+        feedDetail.setLike(checkLike);
+
         return ResponseEntity.status(HttpStatus.OK).body(feedDetail);
     }
 
