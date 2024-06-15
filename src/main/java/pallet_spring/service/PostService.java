@@ -10,11 +10,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import pallet_spring.mapper.HeartMapper;
 import pallet_spring.mapper.PostMapper;
 import pallet_spring.mapper.UserMapper;
+import pallet_spring.model.HeartDto;
 import pallet_spring.model.Post;
 import pallet_spring.model.PostDTO;
-import pallet_spring.model.User;
 import pallet_spring.model.response.PostTimeRes;
 import pallet_spring.security.jwt.JwtProvider;
 
@@ -39,14 +40,19 @@ public class PostService {
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private UserService userService;
     @Autowired
     private PostMapper postMapper;
+    @Autowired
+    private HeartMapper heartMapper;
 
     @Transactional
     public void postUpload(PostDTO postDTO, String userId) {
 
         // userNo 받아오기
-        int userNo = getUserNo(userId);
+        int userNo = userService.getUserNo(userId);
         log.info("1");
         Post post = toEntity(postDTO, userNo);
         log.info("2");
@@ -55,7 +61,7 @@ public class PostService {
 
     public void postUpdate(PostDTO postDTO, int post_no, String userId) {
         // userNo 받아오기
-        int userNo = getUserNo(userId);
+        int userNo = userService.getUserNo(userId);
         Post post = toEntity(postDTO, userNo);
         post.setPost_no(post_no);
         postMapper.updatePost(post);
@@ -92,17 +98,7 @@ public class PostService {
         entity.setShare_check(dto.isShare_check());
         return entity;
     }
-    public int getUserNo(String userId) {
-        // 해당 user 정보 불러오기
-        User user = userMapper.findUserDetail(userId);
 
-        if (user == null) {
-            throw new RuntimeException("계정정보가 없습니다");
-        } else {
-            // user_no 값 불러와 postDTO에 저장
-            return user.getNo();
-        }
-    }
 
     public String uploadS3(MultipartFile file, String userId) {
 
@@ -134,6 +130,23 @@ public class PostService {
             throw new RuntimeException("삭제 실패");
         }
 
+    }
+
+    @Transactional
+    public void increaseLikeCount(HeartDto heartDto) {
+        postMapper.increaseLikeCount(heartDto.getPost_no());
+        userMapper.increaseTotalLikeCount(heartDto.getUser_no());
+        heartMapper.insertHeart(heartDto);
+    }
+
+    // post_no에 해당 하는 게시글의 like_count 가져와 해당 게시글의 존재 여부 확인
+    public void validatePost(int post_no) {
+
+        boolean checkPost = postMapper.validatePost(post_no);
+
+        if (!checkPost) {
+            throw new RuntimeException("해당 게시글이 존재하지 않습니다.");
+        }
     }
 
     private String getImageURL(String fileName) {
