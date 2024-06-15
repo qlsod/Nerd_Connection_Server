@@ -27,18 +27,6 @@ public interface PostMapper {
 
 
 
-    // 시간 순 정렬하여 url 불러오기
-    // property와 column 매칭
-//    @Results(id = "PostMap", value = {
-//            @Result(property = "post_no", column = "post_no"),
-//            @Result(property = "user_no", column = "user_no"),
-//            @Result(property = "content", column = "content"),
-//            @Result(property = "photo_url", column = "photo_url"),
-//            @Result(property = "share_check", column = "share_check"),
-//            @Result(property = "create_date", column = "create_date"),
-//            @Result(property = "update_date", column = "update_date"),
-//            @Result(property = "delete_date", column = "delete_date")
-//    })
 
     @Results(id = "PostMap", value = {
             @Result(property = "post_no", column = "post_no"),
@@ -58,12 +46,19 @@ public interface PostMapper {
             @Result(property = "post_no", column = "post_no"),
             @Result(property = "content", column = "content"),
             @Result(property = "photo_url", column = "photo_url"),
+            @Result(property = "name", column = "name"),
+            @Result(property = "like_count", column = "like_count"),
             @Result(property = "create_date", column = "create_date")
     })
-    @Select("SELECT content, photo_url, create_date FROM posts WHERE post_no = #{post_no}")
+    @Select("SELECT posts.content, posts.photo_url, posts.create_date, users.name, like_count FROM posts JOIN users ON posts.user_no = users.no WHERE post_no = #{post_no}")
     FeedDetail getFeedDetail(@Param("post_no") int post_no);
 
+    @Update("UPDATE posts SET like_count = like_count + 1 WHERE post_no = #{post_no}")
+    void increaseLikeCount(@Param("post_no") int post_no);
 
+
+    @Select("SELECT COUNT(*) > 0 FROM posts WHERE post_no = #{post_no}")
+    boolean validatePost(@Param("post_no") int post_no);
 
     @Select("SELECT SUM(like_count) AS total_like_count, COUNT(user_no) AS total_post_count FROM posts WHERE user_no = #{user_no}")
     MyProfileTotalCountDTO getTotalPosts(@Param("user_no") int user_no);
