@@ -31,9 +31,8 @@ public interface UserMapper {
     @Select("SELECT id, name FROM users WHERE no = #{no}")
     MyProfileDTO getMyProfile(@Param("no") int no);
 
-
-
-
+    @Update("UPDATE users SET total_like_count = total_like_count + 1 WHERE no = #{user_no}")
+    void increaseTotalLikeCount(@Param("user_no") int user_no);
 
     @Select("SELECT photo_url, post_no FROM posts WHERE user_no = #{userNo}")
     List<String> getPhotoUrlsByUserId(@Param("userNo") int userNo);
