@@ -55,21 +55,14 @@ public class UserController {
         try {
             int userNo = userMapper.getUserNo(userId);
 
-            log.info(String.valueOf(userNo));
-            // Id, name 불러옴
             MyProfileDTO myProfile = userMapper.getMyProfile(userNo);
 
             /** 총 좋아요 수 , 총 게시물 등록 수 불러오기
-             *  해당 부분 users 테이블에 컬럼으로 등록해야 함
              *  현재 게시물을 count하여 불러오는 중
              */
-            MyProfileTotalCountDTO myProfileTotalCountDTO = postMapper.getTotalPosts(userNo);
             List<Image> image = postMapper.getMyPosts(userNo);
             MyPageRes myPageRes = new MyPageRes();
             myPageRes.myProfileToResDto(myProfile);
-
-            // 해당 부분 교체 필요
-            myPageRes.myProfileTotalCountToResDto(myProfileTotalCountDTO);
 
             myPageRes.imageToResDto(image);
 

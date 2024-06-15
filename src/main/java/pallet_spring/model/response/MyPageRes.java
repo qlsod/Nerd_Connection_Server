@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import pallet_spring.model.Image;
 import pallet_spring.model.MyProfileDTO;
-import pallet_spring.model.MyProfileTotalCountDTO;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
@@ -38,11 +37,8 @@ public class MyPageRes {
     public void myProfileToResDto(MyProfileDTO myProfileDTO) {
         this.id = myProfileDTO.getId();
         this.name = myProfileDTO.getName();
-    }
-
-    public void myProfileTotalCountToResDto(MyProfileTotalCountDTO myProfileTotalCountDTO) {
-        this.total_like_count = myProfileTotalCountDTO.getTotalLikeCount();
-        this.total_post_count = myProfileTotalCountDTO.getTotalPostCount();
+        this.total_like_count = myProfileDTO.getTotal_like_count();
+        this.total_post_count = myProfileDTO.getTotal_post_count();
     }
 
     public void imageToResDto(List<Image> images) {

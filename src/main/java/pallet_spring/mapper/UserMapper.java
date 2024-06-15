@@ -26,9 +26,11 @@ public interface UserMapper {
     @Results(id = "UserProfile", value = {
             @Result(property = "no", column = "no"),
             @Result(property = "name", column = "name"),
-            @Result(property = "id", column = "id")
+            @Result(property = "id", column = "id"),
+            @Result(property = "total_like_count", column = "total_like_count"),
+            @Result(property = "total_post_count", column = "total_post_count")
     })
-    @Select("SELECT id, name FROM users WHERE no = #{no}")
+    @Select("SELECT id, name, total_like_count, total_post_count FROM users WHERE no = #{no}")
     MyProfileDTO getMyProfile(@Param("no") int no);
 
     @Update("UPDATE users SET total_like_count = total_like_count + 1 WHERE no = #{user_no}")
