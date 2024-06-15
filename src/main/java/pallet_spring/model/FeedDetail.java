@@ -14,8 +14,11 @@ public class FeedDetail {
     @NotBlank
     private String photo_url;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd-HH:mm:ss",
-            timezone = "Asia/Seoul")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd", timezone = "Asia/Seoul")
     private Date create_date;
+
+    private String name;
+    private int like_count;
+    boolean like;
 
 }
