@@ -57,14 +57,10 @@ public class UserController {
 
             MyProfileDTO myProfile = userMapper.getMyProfile(userNo);
 
-            /** 총 좋아요 수 , 총 게시물 등록 수 불러오기
-             *  현재 게시물을 count하여 불러오는 중
-             */
             List<Image> image = postMapper.getMyPosts(userNo);
             MyPageRes myPageRes = new MyPageRes();
             myPageRes.myProfileToResDto(myProfile);
-
-            myPageRes.imageToResDto(image);
+            myPageRes.setMyPost(image);
 
             return ResponseEntity.status(HttpStatus.OK).body(myPageRes);
 
