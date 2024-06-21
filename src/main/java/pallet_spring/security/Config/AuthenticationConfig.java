@@ -1,4 +1,4 @@
-package pallet_spring.security;
+package pallet_spring.security.Config;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
