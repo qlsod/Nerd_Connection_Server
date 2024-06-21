@@ -1,4 +1,4 @@
-package pallet_spring.security;
+package pallet_spring.security.Config;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
