@@ -70,7 +70,7 @@ public interface PostMapper {
     @Result(property = "user_no", column = "user_no")
     @Result(property = "photo_url", column = "photo_url")
     @Result(property = "post_no", column = "post_no")
-    @Select("SELECT photo_url, post_no FROM posts WHERE user_no = #{user_no}")
+    @Select("SELECT photo_url, post_no FROM posts WHERE user_no = #{user_no} ORDER BY create_date DESC")
     List<Image> getMyPosts(@Param("user_no") int user_no);
 
     @ResultMap("PostMap")
