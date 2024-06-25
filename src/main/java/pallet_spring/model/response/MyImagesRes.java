@@ -1,15 +1,17 @@
-package pallet_spring.model;
+package pallet_spring.model.response;
 
 import lombok.Data;
 
 @Data
-public class MyImage {
+public class MyImagesRes {
 
     private String content;
 
     private String photo_url;
 
     private int post_no;
+
+    private int like_count;
 
 //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss",
 //            timezone = "Asia/Seoul")

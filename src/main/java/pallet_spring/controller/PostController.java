@@ -18,6 +18,7 @@ import pallet_spring.mapper.PostMapper;
 import pallet_spring.mapper.UserMapper;
 import pallet_spring.model.*;
 import pallet_spring.model.response.ImageRes;
+import pallet_spring.model.response.MyImagesRes;
 import pallet_spring.model.response.PostTimeRes;
 import pallet_spring.security.jwt.JwtProvider;
 import pallet_spring.service.PostService;
@@ -142,7 +143,7 @@ public class PostController {
             @ApiResponse(responseCode = "400", description = "실패")
     })
     @SecurityRequirement(name = "accessToken")
-    public List<MyImage> returnMyImageURL(
+    public List<MyImagesRes> returnMyImageURL(
             @Parameter(description = "해당 연도, 월, 일 입력", example = "2024-02-26")
             @PathVariable("targetTime") String targetTime,
             HttpServletRequest request) {

@@ -2,6 +2,7 @@ package pallet_spring.mapper;
 
 import org.apache.ibatis.annotations.*;
 import pallet_spring.model.*;
+import pallet_spring.model.response.MyImagesRes;
 import pallet_spring.model.response.PostTimeRes;
 
 import java.util.List;
@@ -101,14 +102,15 @@ public interface PostMapper {
     @Results(id = "MyImageMap", value = {
             @Result(property = "post_no", column = "post_no"),
             @Result(property = "photo_url", column = "photo_url"),
-            @Result(property = "update_date", column = "update_date"),
+            @Result(property = "like_count", column = "like_count"),
+            @Result(property = "create_date", column = "create_date"),
     })
-    @Select("SELECT post_no, photo_url, content FROM users " +
+    @Select("SELECT post_no, photo_url, content, like_count FROM users " +
             "JOIN posts On users.no = posts.user_no " +
             "WHERE users.no = #{userNo} " +
             "AND DATE_FORMAT(posts.create_date, '%Y-%m-%d') = #{targetTime} " +
             "ORDER BY posts.create_date ASC")
-    List<MyImage> getMyImage(@Param("userNo") int userNo, @Param("targetTime") String targetTime);
+    List<MyImagesRes> getMyImage(@Param("userNo") int userNo, @Param("targetTime") String targetTime);
 
     @Results(id = "MyPostTime", value = {
             @Result(property = "create_date", column = "create_date"),
