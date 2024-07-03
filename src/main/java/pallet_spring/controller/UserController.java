@@ -81,8 +81,6 @@ public class UserController {
     })
     public ResponseEntity<LoginRes> login(@RequestBody @Valid Login login, HttpServletResponse response) {
 
-        log.info("여기 요청 옴");
-
         // 입력된 ID, PW 일치 여부 검사
         userService.login(login);
 
@@ -145,4 +143,80 @@ public class UserController {
         userService.deleteCookie(response);
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+
+
+    // 비밀번호 확인
+    @PostMapping("/check-password")
+    @Operation(summary = "비밀번호 확인",
+            description = "토큰 확인하여 계정 비밀번호 체크")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @SecurityRequirement(name = "accessToken")
+    public ResponseEntity<Void> checkPassword(HttpServletRequest request, @RequestBody PasswordDto passwordDto) {
+        // 토큰에 저장된 유저 ID 꺼내는 로직
+        String id = jwtProvider.getUserIdLogic(request);
+
+        String rawPassword = passwordDto.getPassword();
+        String encodedPassword = userMapper.getPasswordById(id);
+
+        userService.checkUserPW(rawPassword, encodedPassword);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // 이름 수정
+    @PatchMapping("/nickname")
+    @Operation(summary = "닉네임 수정",
+            description = "토큰 확인하여 계정 닉네임 변경")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @SecurityRequirement(name = "accessToken")
+    public ResponseEntity<Void> patchNickname(HttpServletRequest request, @RequestBody NicknamePatchDto nicknamePatchDto) {
+        // 토큰에 저장된 유저 ID 꺼내는 로직
+        String id = jwtProvider.getUserIdLogic(request);
+
+        /** 유저 있는지 확인 필요
+
+
+         **/
+
+        String newName = nicknamePatchDto.getName();
+
+        userMapper.updateNickname(id, newName);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+    // 비밀번호 변경
+    @PatchMapping("/password")
+    @Operation(summary = "비밀번호 수정",
+            description = "토큰 확인하여 계정 닉네임 변경")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @SecurityRequirement(name = "accessToken")
+    public ResponseEntity<Void> patchNickname(HttpServletRequest request, @RequestBody PasswordDto passwordDto) {
+        // 토큰에 저장된 유저 ID 꺼내는 로직
+        String id = jwtProvider.getUserIdLogic(request);
+
+        /** 유저 있는지 확인 필요
+
+
+         **/
+
+
+        userService.updatePassword(id, passwordDto);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+
+
 }

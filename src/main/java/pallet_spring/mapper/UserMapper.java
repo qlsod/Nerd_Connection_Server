@@ -79,4 +79,19 @@ public interface UserMapper {
     @Select("SELECT no FROM users WHERE id=#{id}")
     int getUserNo(@Param("id") String id);
 
+
+    @Update("UPDATE users " +
+            "SET name = #{name}" +
+            "WHERE id=#{id}")
+    void updateNickname(@Param("id") String id, @Param("name") String name);
+
+    @Result(property = "password", column = "password")
+    @Select("SELECT password FROM users WHERE id=#{id}")
+    String getPasswordById(@Param("id") String id);
+
+    @Update("UPDATE users " +
+            "SET password = #{password}" +
+            "WHERE id=#{id}")
+    void updatePassword(@Param("id") String id, @Param("password") String password);
+
 }

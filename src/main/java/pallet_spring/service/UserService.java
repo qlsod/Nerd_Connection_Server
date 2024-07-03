@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pallet_spring.mapper.UserMapper;
 import pallet_spring.model.Login;
+import pallet_spring.model.PasswordDto;
 import pallet_spring.model.SignUpDTO;
 import pallet_spring.model.User;
 import pallet_spring.security.jwt.JwtProvider;
@@ -45,6 +46,13 @@ public class UserService {
         } else {
             throw new RuntimeException("이미 가입된 ID입니다");
         }
+
+    }
+
+    public void updatePassword(String id, PasswordDto passwordDto) {
+
+        String encodedPassword = passwordEncoder.encode(passwordDto.getPassword());  // 암호 강도 10 사용
+        userMapper.updatePassword(id, encodedPassword);
 
     }
 
