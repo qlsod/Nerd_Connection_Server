@@ -193,6 +193,8 @@ public class UserController {
     }
 
 
+
+
     // 비밀번호 변경
     @PatchMapping("/password")
     @Operation(summary = "비밀번호 수정",
@@ -202,21 +204,21 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "실패")
     })
     @SecurityRequirement(name = "accessToken")
-    public ResponseEntity<Void> patchPW(@Valid @RequestBody Login login) {
+    public ResponseEntity<Void> patchPW(HttpServletRequest request, @Valid @RequestBody PasswordDto passwordDto) {
         // 토큰에 저장된 유저 ID 꺼내는 로직
-//        String id = jwtProvider.getUserIdLogic(request);
+        String id = jwtProvider.getUserIdLogic(request);
 
-        String id = login.getId();
         /** 유저 있는지 확인 필요
 
 
          **/
 
 
-        userService.updatePassword(id, login);
+        userService.updatePassword(id, passwordDto);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
 
 
 
