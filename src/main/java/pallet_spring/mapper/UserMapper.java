@@ -89,6 +89,10 @@ public interface UserMapper {
     @Select("SELECT password FROM users WHERE id=#{id}")
     String getPasswordById(@Param("id") String id);
 
+    @Result(property = "password", column = "password")
+    @Select("SELECT COUNT(name) from users WHERE name=#{name}")
+    int checkUserNickName(@Param("name") String name);
+
     @Update("UPDATE users " +
             "SET password = #{password}" +
             "WHERE id=#{id}")
