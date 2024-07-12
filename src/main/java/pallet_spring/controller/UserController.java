@@ -14,10 +14,12 @@ import pallet_spring.mapper.PostMapper;
 import pallet_spring.mapper.UserMapper;
 import pallet_spring.model.*;
 import pallet_spring.model.response.LoginRes;
+import pallet_spring.model.response.MailRes;
 import pallet_spring.model.response.MyPageRes;
 import pallet_spring.security.jwt.JwtProvider;
 import pallet_spring.service.UserService;
 
+import javax.mail.MessagingException;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -181,9 +183,15 @@ public class UserController {
         String id = jwtProvider.getUserIdLogic(request);
 
         /** 유저 있는지 확인 필요
-
-
+         *
+         *
+         *
+         *
          **/
+
+
+        // 중보 닉네임 체크
+        userService.checkNickName(nicknamePatchDto.getName());
 
         String newName = nicknamePatchDto.getName();
 
@@ -217,6 +225,21 @@ public class UserController {
         userService.updatePassword(id, passwordDto);
 
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // 메일 보내기
+    @PostMapping("/mail")
+    @Operation(summary = "이메일 인증",
+            description = "랜덤 6자리 난수 생성 후 이메일 전송")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    public ResponseEntity<MailRes> sendMail(@Valid @RequestBody MailRequestDto mailRequestDto) throws MessagingException {
+
+        MailRes mailRes = userService.sendMailConfirm(mailRequestDto);
+
+        return ResponseEntity.status(HttpStatus.OK).body(mailRes);
     }
 
 
