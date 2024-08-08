@@ -138,6 +138,9 @@ public class UserController {
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String id = jwtProvider.getUserIdLogic(request);
 
+        // 유저 존재 여부 확인
+        userService.checkUserExist(id);
+
         // Redis에 저장된 RefreshToken 토큰 삭제
         jwtProvider.deleteRefreshToken(id);
 
@@ -145,7 +148,6 @@ public class UserController {
         userService.deleteCookie(response);
         return new ResponseEntity<>(HttpStatus.OK);
     }
-
 
 
     // 비밀번호 확인
@@ -182,13 +184,8 @@ public class UserController {
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String id = jwtProvider.getUserIdLogic(request);
 
-        /** 유저 있는지 확인 필요
-         *
-         *
-         *
-         *
-         **/
-
+        // 유저 존재 여부 확인
+        userService.checkUserExist(id);
 
         // 중보 닉네임 체크
         userService.checkNickName(nicknamePatchDto.getName());
@@ -216,11 +213,8 @@ public class UserController {
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String id = jwtProvider.getUserIdLogic(request);
 
-        /** 유저 있는지 확인 필요
-
-
-         **/
-
+        // 유저 존재 여부 확인
+        userService.checkUserExist(id);
 
         userService.updatePassword(id, passwordDto);
 
