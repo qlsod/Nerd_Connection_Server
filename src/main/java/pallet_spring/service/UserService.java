@@ -86,7 +86,7 @@ public class UserService {
             // 메일 내용 설정
             String msgOfEmail="";
             msgOfEmail += "<div style='margin:20px;'>";
-            msgOfEmail += "<h1> 안녕하세요 test 입니다. </h1>";
+            msgOfEmail += "<h1> 안녕하세요 Palette 입니다. </h1>";
             msgOfEmail += "<br>";
             msgOfEmail += "<p>아래 코드를 입력해주세요<p>";
             msgOfEmail += "<br>";
@@ -113,12 +113,19 @@ public class UserService {
 
     }
 
-    public void checkNickName(String nickName) {
-        int checkNick = userMapper.checkUserNickName(nickName);
+    public void checkNickName(String name) {
+        int checkNick = userMapper.checkUserNickName(name);
         if (checkNick != 0) {
             throw new RuntimeException("해당 닉네임이 존재합니다.");
         }
 
+    }
+
+    public void checkUserExist(String id) {
+        int checkUser = userMapper.checkUser(id);
+        if (checkUser != 0) {
+            throw new RuntimeException("해당 유저가 존재하지 않습니다.");
+        }
     }
 
     public MailRes sendMailConfirm(MailRequestDto mailRequestDto) throws MessagingException {
@@ -134,7 +141,6 @@ public class UserService {
 
     // 랜덤 6자리 인증 번호 생성
     private void createCode() {
-        log.info("3");
 
         Random random = new Random();
         StringBuffer key = new StringBuffer();
