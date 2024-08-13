@@ -59,10 +59,11 @@ public class UserService {
 
     }
 
-    public void updatePassword(String id, PasswordDto passwordDto) {
+    public void updatePassword(Login login) {
 
-        String encodedPassword = passwordEncoder.encode(passwordDto.getPassword());  // 암호 강도 10 사용
-        userMapper.updatePassword(id, encodedPassword);
+        String encodedPassword = passwordEncoder.encode(login.getPassword());  // 암호 강도 10 사용
+
+        userMapper.updatePassword(login.getId(), encodedPassword);
 
     }
 
@@ -123,7 +124,7 @@ public class UserService {
 
     public void checkUserExist(String id) {
         int checkUser = userMapper.checkUser(id);
-        if (checkUser != 0) {
+        if (checkUser == 0) {
             throw new RuntimeException("해당 유저가 존재하지 않습니다.");
         }
     }

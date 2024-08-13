@@ -45,6 +45,7 @@ public class AuthenticationConfig {
                 .antMatchers("/v2/api-docs", "/v3/api-docs", "/v3/api-docs/**", "/swagger-resources",
                         "/swagger-resources/**", "/configuration/ui", "/configuration/security", "/swagger-ui/**",
                         "/webjars/**", "/swagger-ui.html", "/posts/feed/*", "/users/mail").permitAll()
+                .antMatchers(HttpMethod.PATCH, "/users/password").permitAll() // 토큰 필요없는 비밀번호 변경
                 .anyRequest().authenticated() // 다른 경로에 대한 요청 차단
                 .and()
                 .sessionManagement()

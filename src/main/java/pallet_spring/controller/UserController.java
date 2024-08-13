@@ -172,6 +172,7 @@ public class UserController {
     }
 
     // 이름 수정
+
     @PatchMapping("/nickname")
     @Operation(summary = "닉네임 수정",
             description = "토큰 확인하여 계정 닉네임 변경")
@@ -199,24 +200,44 @@ public class UserController {
 
 
 
-
     // 비밀번호 변경
-    @PatchMapping("/password")
+    @PatchMapping("/password-jwt")
     @Operation(summary = "비밀번호 수정",
-            description = "토큰 확인하여 계정 닉네임 변경")
+            description = "토큰 이용한 계정 비밀번호 변경")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "성공"),
             @ApiResponse(responseCode = "400", description = "실패")
     })
     @SecurityRequirement(name = "accessToken")
-    public ResponseEntity<Void> patchPW(HttpServletRequest request, @Valid @RequestBody PasswordDto passwordDto) {
+    public ResponseEntity<Void> patchPwByJwt(HttpServletRequest request, @Valid @RequestBody PasswordDto passwordDto) {
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String id = jwtProvider.getUserIdLogic(request);
 
         // 유저 존재 여부 확인
         userService.checkUserExist(id);
 
-        userService.updatePassword(id, passwordDto);
+        Login login = new Login();
+        login.setId(id);
+        login.setPassword(passwordDto.getPassword());
+        userService.updatePassword(login);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    // 비밀번호 변경(토큰 x)
+    @PatchMapping("/password")
+    @Operation(summary = "비밀번호 수정",
+            description = "Email 모를 경우 해당 계정 비밀번호 변경 - 토큰 x")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @SecurityRequirement(name = "accessToken")
+    public ResponseEntity<Void> patchPw(@Valid @RequestBody Login login) {
+        // 유저 존재 여부 확인
+        userService.checkUserExist(login.getId());
+
+        userService.updatePassword(login);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
