@@ -181,7 +181,7 @@ public class UserController {
             @ApiResponse(responseCode = "400", description = "실패")
     })
     @SecurityRequirement(name = "accessToken")
-    public ResponseEntity<Void> patchNickname(HttpServletRequest request, @Valid @RequestBody NicknamePatchDto nicknamePatchDto) {
+    public ResponseEntity<NicknamePatchDto> patchNickname(HttpServletRequest request, @Valid @RequestBody NicknamePatchDto nicknamePatchDto) {
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String id = jwtProvider.getUserIdLogic(request);
 
@@ -193,9 +193,11 @@ public class UserController {
 
         String newName = nicknamePatchDto.getName();
 
+        NicknamePatchDto response = new NicknamePatchDto(newName);
+
         userMapper.updateNickname(id, newName);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
 
