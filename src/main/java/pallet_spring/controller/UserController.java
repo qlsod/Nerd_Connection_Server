@@ -149,6 +149,36 @@ public class UserController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
+    @DeleteMapping("")
+    @Operation(summary = "회원탈퇴",
+            description = "토큰 확인하여 해당 유저와 관련된 모든 내용 삭제")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "성공"),
+            @ApiResponse(responseCode = "400", description = "실패")
+    })
+    @SecurityRequirement(name = "accessToken")
+    public ResponseEntity<Void> deleteUser(HttpServletRequest request, HttpServletResponse response) {
+
+        log.info("시작");
+
+        // 토큰에 저장된 유저 ID 꺼내는 로직
+        String id = jwtProvider.getUserIdLogic(request);
+
+        // 유저 존재 여부 확인
+        userService.checkUserExist(id);
+
+        // Redis에 저장된 RefreshToken 토큰 삭제
+        jwtProvider.deleteRefreshToken(id);
+
+        // Cookie에 저장된 RefreshToken 토큰 삭제
+        userService.deleteCookie(response);
+
+        userService.deleteUserFromDB(id);
+
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 
     // 비밀번호 확인
     @PostMapping("/check-password")

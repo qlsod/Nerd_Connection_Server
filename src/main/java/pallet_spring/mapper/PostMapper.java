@@ -91,6 +91,9 @@ public interface PostMapper {
             "LIMIT 18")
     List<Image> getAll();
 
+    @Delete("DELETE FROM posts WHERE user_no = (SELECT no FROM users WHERE id = #{id})")
+    void deletePostFromId(@Param("id") String id);
+
     @ResultMap("ImageMap")
     @Select("SELECT post_no, photo_url  FROM posts " +
             "WHERE share_check = 1 " +

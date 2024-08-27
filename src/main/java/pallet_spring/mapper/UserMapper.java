@@ -92,6 +92,9 @@ public interface UserMapper {
     @Select("SELECT COUNT(name) FROM users WHERE name=#{name}")
     int checkUserNickName(@Param("name") String name);
 
+    @Delete("DELETE FROM users WHERE id= #{id}")
+    void deleteUser(@Param("id") String id);
+
     @Select("SELECT COUNT(id) FROM users WHERE id=#{id}")
     int checkUser(@Param("id") String id);
 

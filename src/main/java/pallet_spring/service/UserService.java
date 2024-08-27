@@ -7,6 +7,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import pallet_spring.mapper.HeartMapper;
+import pallet_spring.mapper.PostMapper;
 import pallet_spring.mapper.UserMapper;
 import pallet_spring.model.*;
 import pallet_spring.model.response.MailRes;
@@ -34,6 +36,10 @@ public class UserService {
 
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private HeartMapper heartMapper;
+    @Autowired
+    private PostMapper postMapper;
     @Autowired
     private JwtProvider jwtProvider;
 
@@ -64,7 +70,20 @@ public class UserService {
         String encodedPassword = passwordEncoder.encode(login.getPassword());  // 암호 강도 10 사용
 
         userMapper.updatePassword(login.getId(), encodedPassword);
+    }
 
+
+    // 해당 사용자의 모든 내용 삭제
+    @Transactional
+    public void deleteUserFromDB(String id){
+
+        heartMapper.deleteHeartById(id);
+
+        log.info("1");
+        postMapper.deletePostFromId(id);
+        log.info("2");
+        userMapper.deleteUser(id);
+        log.info("3");
     }
 
     public MimeMessage sendEmail(MailRequestDto mailRequestDto) throws MessagingException {
