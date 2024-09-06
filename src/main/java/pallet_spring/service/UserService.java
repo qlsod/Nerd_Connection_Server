@@ -77,13 +77,12 @@ public class UserService {
     @Transactional
     public void deleteUserFromDB(String id){
 
+        // hearts table 내용 삭제
         heartMapper.deleteHeartById(id);
-
-        log.info("1");
+        // posts table 내용 삭제
         postMapper.deletePostFromId(id);
-        log.info("2");
+        // users table 내용 삭제
         userMapper.deleteUser(id);
-        log.info("3");
     }
 
     public MimeMessage sendEmail(MailRequestDto mailRequestDto) throws MessagingException {

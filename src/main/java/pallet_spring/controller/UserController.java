@@ -159,8 +159,6 @@ public class UserController {
     @SecurityRequirement(name = "accessToken")
     public ResponseEntity<Void> deleteUser(HttpServletRequest request, HttpServletResponse response) {
 
-        log.info("시작");
-
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String id = jwtProvider.getUserIdLogic(request);
 
