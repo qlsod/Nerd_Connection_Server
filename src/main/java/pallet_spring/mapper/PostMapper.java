@@ -73,9 +73,13 @@ public interface PostMapper {
     @Select("SELECT photo_url, post_no FROM posts WHERE user_no = #{user_no} ORDER BY create_date DESC")
     List<Image> getMyPosts(@Param("user_no") int user_no);
 
-    @ResultMap("PostMap")
-    @Select("SELECT photo_url FROM posts WHERE post_no = #{post_no}")
-    Post getPostUrl(@Param("post_no") int post_no);
+    @Results(id = "PostLikeMap", value = {
+            @Result(property = "post_no", column = "post_no"),
+            @Result(property = "like_count", column = "like_count"),
+            @Result(property = "photo_url", column = "photo_url")
+    })
+    @Select("SELECT like_count, photo_url FROM posts WHERE post_no = #{post_no}")
+    PostLikeDto getPostUrl(@Param("post_no") int post_no);
 
     @ResultMap("PostMap")
     @Select("DELETE FROM posts WHERE post_no = #{post_no}")

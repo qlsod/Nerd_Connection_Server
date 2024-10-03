@@ -386,21 +386,8 @@ public class PostController {
         // 토큰에 저장된 유저 ID 꺼내는 로직
         String userId = jwtProvider.getUserIdLogic(request);
 
-        // post_no 해당 이미지 S3에서 삭제
-        Post postDTO = postMapper.getPostUrl(post_no);
-        if (postDTO == null ) {
-            throw new RuntimeException("해당 글이 존재하지 않습니다");
-        }
-        String photo_url = postDTO.getPhoto_url();
-        String keyName = photo_url.substring(53);
-        postService.deleteS3(keyName);
+        postService.deletePost(userId, post_no);
 
-        // post_no 해당 글 삭제
-        postMapper.deletePost(post_no);
-
-        // user의 총 게시글 개수 -1
-        int userNo = userService.getUserNo(userId);
-        userMapper.decreaseTotalPostCount(userNo);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

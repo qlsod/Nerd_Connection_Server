@@ -16,6 +16,7 @@ import pallet_spring.mapper.UserMapper;
 import pallet_spring.model.HeartDto;
 import pallet_spring.model.Post;
 import pallet_spring.model.PostDTO;
+import pallet_spring.model.PostLikeDto;
 import pallet_spring.model.response.PostTimeRes;
 import pallet_spring.security.jwt.JwtProvider;
 
@@ -132,6 +133,29 @@ public class PostService {
             throw new RuntimeException("삭제 실패");
         }
 
+    }
+
+    @Transactional
+    public void deletePost(String userId, int post_no) {
+        // post_no 해당 이미지 S3에서 삭제
+        PostLikeDto postDTO = postMapper.getPostUrl(post_no);
+        if (postDTO == null ) {
+            throw new RuntimeException("해당 글이 존재하지 않습니다");
+        }
+
+        String photo_url = postDTO.getPhoto_url();
+        String keyName = photo_url.substring(53);
+        deleteS3(keyName);
+
+        // post_no 해당 글 삭제
+        postMapper.deletePost(post_no);
+
+        // user의 총 게시글 개수 -1
+        int userNo = userService.getUserNo(userId);
+        userMapper.decreaseTotalPostCount(userNo);
+
+        // user의 총 좋아요 수에서 post_no 해당 게시글의 좋아요 수 빼기
+        userMapper.decreaseTotalLikeCountByPosLikeCount(postDTO.getLike_count(), userId);
     }
 
     @Transactional

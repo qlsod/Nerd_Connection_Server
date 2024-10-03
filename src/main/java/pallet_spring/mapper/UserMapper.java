@@ -33,6 +33,10 @@ public interface UserMapper {
     @Select("SELECT id, name, total_like_count, total_post_count FROM users WHERE no = #{no}")
     MyProfileDTO getMyProfile(@Param("no") int no);
 
+    @ResultMap("UserProfile")
+    @Update("UPDATE users SET total_like_count = total_like_count - #{like_count} where id = #{id}")
+    void decreaseTotalLikeCountByPosLikeCount(@Param("like_count") int like_count, @Param("id") String id);
+
     @Update("UPDATE users SET total_like_count = total_like_count + 1 " +
             "WHERE no = (SELECT user_no FROM posts WHERE post_no = #{post_no})")
     void increaseTotalLikeCount(@Param("post_no") int post_no);
