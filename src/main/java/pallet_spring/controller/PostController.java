@@ -155,7 +155,9 @@ public class PostController {
         int userNo = userMapper.getUserNo(id);
 
         // 해당 유저의 Image 받아옴
-        return postMapper.getMyImage(userNo, targetTime);
+   return postMapper.getMyImage(userNo, targetTime);
+
+
     }
 
 

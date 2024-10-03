@@ -12,6 +12,7 @@ public class MyImagesRes {
     private int post_no;
 
     private int like_count;
+    boolean like;
 
 //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss",
 //            timezone = "Asia/Seoul")

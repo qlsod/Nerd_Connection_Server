@@ -109,15 +109,22 @@ public interface PostMapper {
     @Results(id = "MyImageMap", value = {
             @Result(property = "post_no", column = "post_no"),
             @Result(property = "photo_url", column = "photo_url"),
+            @Result(property = "content", column = "content"),
             @Result(property = "like_count", column = "like_count"),
             @Result(property = "create_date", column = "create_date"),
+            @Result(property = "like", column = "is_liked") // 변경된 필드 이름과 매핑
     })
-    @Select("SELECT post_no, photo_url, content, like_count FROM users " +
-            "JOIN posts On users.no = posts.user_no " +
+    @Select("SELECT posts.post_no, posts.photo_url, posts.content, posts.like_count, " +
+            "CASE WHEN hearts.user_no IS NOT NULL THEN true ELSE false END AS `is_liked` " +  // like 대신 is_liked로 변경
+            "FROM users " +
+            "JOIN posts ON users.no = posts.user_no " +
+            "LEFT JOIN hearts ON posts.post_no = hearts.post_no AND hearts.user_no = #{userNo} " +
             "WHERE users.no = #{userNo} " +
             "AND DATE_FORMAT(posts.create_date, '%Y-%m-%d') = #{targetTime} " +
             "ORDER BY posts.create_date ASC")
     List<MyImagesRes> getMyImage(@Param("userNo") int userNo, @Param("targetTime") String targetTime);
+
+
 
     @Results(id = "MyPostTime", value = {
             @Result(property = "create_date", column = "create_date"),
